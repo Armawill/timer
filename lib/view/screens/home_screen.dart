@@ -12,14 +12,24 @@ class HomeScreen extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const TabBar(tabs: [
-            Tab(
-              text: 'Timer',
+          backgroundColor: Colors.white,
+          title: const TabBar(
+            labelStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
-            Tab(
-              text: 'Sequence',
-            ),
-          ]),
+            labelColor: Colors.black,
+            indicatorColor: Colors.red,
+            indicatorWeight: 3.0,
+            tabs: [
+              Tab(
+                text: 'Timer',
+              ),
+              Tab(
+                text: 'Sequence',
+              ),
+            ],
+          ),
         ),
         body: TabBarView(children: [
           TimerTab(),
