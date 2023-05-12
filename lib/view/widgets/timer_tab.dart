@@ -176,6 +176,7 @@ class _Page extends StatelessWidget {
       itemBuilder: (context, index) {
         if (index < count) {
           return CircularTimerButton(
+            id: items[index].id,
             title: items[index].title,
             hours: items[index].hours,
             minutes: items[index].minutes,

@@ -7,7 +7,7 @@ class TimerViewModel with ChangeNotifier {
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
   String? currentTimerTitle;
-  int? currentTimerIndex;
+  String? currentTimerId;
 
   final CountDownController _countDownController = CountDownController();
   CountDownController get controller => _countDownController;
@@ -63,9 +63,10 @@ class TimerViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void onTimerSelected(DateTime selectedTime, [String? title]) {
+  void onTimerSelected(DateTime selectedTime, [String? id, String? title]) {
     _time = selectedTime;
     currentTimerTitle = title;
+    currentTimerId = id;
     notifyListeners();
   }
 
