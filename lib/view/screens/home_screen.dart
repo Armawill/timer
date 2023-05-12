@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:timer/view-model/timer_view_model.dart';
 
 import '../widgets/timer_tab.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +13,7 @@ class HomeScreen extends StatelessWidget {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
+        key: Provider.of<TimerViewModel>(context).scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: const TabBar(

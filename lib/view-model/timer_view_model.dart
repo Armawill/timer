@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../model/timer.dart';
 
 class TimerViewModel with ChangeNotifier {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
   String? currentTimerTitle;
@@ -50,16 +52,20 @@ class TimerViewModel with ChangeNotifier {
 
   bool get isTimerStarted => _isTimerStarted;
 
-  void onTimerAdded(String title) {
+  void onTimerAdded(String title, DateTime time) {
+    var id = DateTime.now().toIso8601String();
     timerList.add(
       Timer(
-        id: DateTime.now().toIso8601String(),
+        id: id,
         title: title,
         hours: time.hour,
         minutes: time.minute,
         seconds: time.second,
       ),
     );
+    currentTimerId = id;
+    currentTimerTitle = title;
+    onTimerSelected(time);
     notifyListeners();
   }
 

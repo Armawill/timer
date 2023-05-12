@@ -16,8 +16,12 @@ class AddTimerButton extends StatelessWidget {
       width: 100,
       child: ElevatedButton(
         onPressed: () {
+          final scaffoldContext =
+              Provider.of<TimerViewModel>(context, listen: false)
+                  .scaffoldKey
+                  .currentContext;
           showModalBottomSheet(
-            context: context,
+            context: scaffoldContext!,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
             isScrollControlled: true,
@@ -25,82 +29,29 @@ class AddTimerButton extends StatelessWidget {
               maxHeight: MediaQuery.of(context).size.height -
                   MediaQueryData.fromWindow(window).padding.top,
             ),
-            builder: (_) {
+            builder: (dialogContext) {
               TextEditingController textController = TextEditingController();
               textController.text =
                   Provider.of<EditTimerViewModel>(context).title;
-              return Column(
-                children: [
-                  const Icon(
-                    Icons.remove,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.close)),
-                      Text(
-                        'Add timer',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            var time = Provider.of<EditTimerViewModel>(context,
-                                    listen: false)
-                                .time;
-                            var title = Provider.of<EditTimerViewModel>(context,
-                                    listen: false)
-                                .title;
-                            Provider.of<TimerViewModel>(context, listen: false)
-                                .onTimerSelected(time);
-                            Provider.of<TimerViewModel>(context, listen: false)
-                                .onTimerAdded(title);
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.check)),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: TextField(
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2),
-                        ),
-                      ),
-                      style: TextStyle(fontSize: 18),
-                      controller: textController,
+              return GestureDetector(
+                child: Column(
+                  children: [
+                    _TopIcon(),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const _CnacelButton(),
+                        const _PageTitle(),
+                        _ApplyButton(
+                            context: context, dialogContext: dialogContext),
+                      ],
                     ),
-                  ),
-                  TimePickerSpinner(
-                      is24HourMode: true,
-                      normalTextStyle:
-                          const TextStyle(fontSize: 24, color: Colors.grey),
-                      highlightedTextStyle:
-                          const TextStyle(fontSize: 24, color: Colors.black),
-                      spacing: 50,
-                      itemHeight: 80,
-                      isShowSeconds: true,
-                      time: Provider.of<EditTimerViewModel>(context).time,
-                      isForce2Digits: true,
-                      onTimeChange: (time) {
-                        Provider.of<EditTimerViewModel>(context, listen: false)
-                            .onTimeSelect(time);
-                      }),
-                ],
+                    _TimerTitleEditor(
+                        context: context, textController: textController),
+                    _TimerPickerSpinner()
+                  ],
+                ),
               );
             },
           );
@@ -116,6 +67,162 @@ class AddTimerButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _TimerPickerSpinner extends StatelessWidget {
+  const _TimerPickerSpinner({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TimePickerSpinner(
+      is24HourMode: true,
+      normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
+      highlightedTextStyle: const TextStyle(fontSize: 24, color: Colors.black),
+      spacing: 50,
+      itemHeight: 80,
+      isShowSeconds: true,
+      time: Provider.of<EditTimerViewModel>(context).time,
+      isForce2Digits: true,
+      onTimeChange: (time) {
+        Provider.of<EditTimerViewModel>(context, listen: false)
+            .onTimeSelect(time);
+      },
+    );
+  }
+}
+
+class _TimePickerSpinner extends StatelessWidget {
+  const _TimePickerSpinner({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TimePickerSpinner(
+        is24HourMode: true,
+        normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
+        highlightedTextStyle:
+            const TextStyle(fontSize: 24, color: Colors.black),
+        spacing: 50,
+        itemHeight: 80,
+        isShowSeconds: true,
+        time: Provider.of<EditTimerViewModel>(context).time,
+        isForce2Digits: true,
+        onTimeChange: (time) {
+          Provider.of<EditTimerViewModel>(context, listen: false)
+              .onTimeSelect(time);
+        });
+  }
+}
+
+class _TimerTitleEditor extends StatelessWidget {
+  final BuildContext context;
+  const _TimerTitleEditor({
+    Key? key,
+    required this.textController,
+    required this.context,
+  }) : super(key: key);
+
+  final TextEditingController textController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: TextField(
+        autofocus: true,
+        decoration: const InputDecoration(
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2),
+          ),
+        ),
+        style: TextStyle(fontSize: 18),
+        controller: textController,
+        onChanged: (value) {
+          Provider.of<EditTimerViewModel>(context, listen: false)
+              .setTitle(value);
+        },
+      ),
+    );
+  }
+}
+
+class _TopIcon extends StatelessWidget {
+  const _TopIcon({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(
+      Icons.remove,
+      size: 40,
+      color: Colors.grey,
+    );
+  }
+}
+
+class _PageTitle extends StatelessWidget {
+  const _PageTitle({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'Add timer',
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+}
+
+class _ApplyButton extends StatelessWidget {
+  final BuildContext context;
+  final BuildContext dialogContext;
+  const _ApplyButton({
+    Key? key,
+    required this.dialogContext,
+    required this.context,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext ctx) {
+    return IconButton(
+      onPressed: () {
+        var time =
+            Provider.of<EditTimerViewModel>(dialogContext, listen: false).time;
+        var title =
+            Provider.of<EditTimerViewModel>(dialogContext, listen: false).title;
+        Provider.of<TimerViewModel>(dialogContext, listen: false)
+            .onTimerAdded(title, time);
+        Navigator.pop(dialogContext);
+      },
+      icon: const Icon(Icons.check),
+    );
+  }
+}
+
+class _CnacelButton extends StatelessWidget {
+  const _CnacelButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.close));
   }
 }
 

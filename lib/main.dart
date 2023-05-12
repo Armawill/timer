@@ -14,32 +14,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => TimerViewModel(),
-          ),
-          ChangeNotifierProvider(
-            create: (context) => EditTimerViewModel(),
-          ),
-        ],
-        child: HomeScreen(),
-      ),
-      theme: ThemeData(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ButtonStyle(
-                textStyle: MaterialStateProperty.all<TextStyle>(
-                  const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => TimerViewModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => EditTimerViewModel(),
+        ),
+      ],
+      child: MaterialApp(
+        home: HomeScreen(),
+        theme: ThemeData(
+          elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ButtonStyle(
+                  textStyle: MaterialStateProperty.all<TextStyle>(
+                    const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ))),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ))),
+        ),
       ),
     );
   }
