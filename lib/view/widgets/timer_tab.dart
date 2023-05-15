@@ -3,8 +3,9 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/timer.dart';
 import 'package:timer/view-model/timer_view_model.dart';
-import 'package:timer/view/widgets/circular_timer_button.dart';
 
+import 'circular_timer_button.dart';
+import 'add_timer_button.dart';
 import 'circular_timer.dart';
 // import 'time_spinner.dart';
 
@@ -144,9 +145,12 @@ class _SavedTimers extends StatelessWidget {
 
     final List<Widget> _pages = Provider.of<TimerViewModel>(context)
         .getPages()
-        .map((page) => _Page(count: page.length, items: page))
+        .map((page) => _Page(
+              count: page.length,
+              items: page,
+              isLastPage: page.length < 6,
+            ))
         .toList();
-
     int _activePage = 0;
 
     return Container(
@@ -160,10 +164,19 @@ class _SavedTimers extends StatelessWidget {
 class _Page extends StatelessWidget {
   final int count;
   final List<Timer> items;
-  const _Page({super.key, required this.count, required this.items});
+  final bool isLastPage;
+  const _Page(
+      {super.key,
+      required this.count,
+      required this.items,
+      required this.isLastPage});
 
   @override
   Widget build(BuildContext context) {
+    bool isListEmpty = false;
+    if (count == 0) {
+      isListEmpty = true;
+    }
     return GridView.builder(
       padding: const EdgeInsets.all(10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -172,9 +185,18 @@ class _Page extends StatelessWidget {
         mainAxisSpacing: 10,
       ),
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: count + 1,
+      itemCount: isListEmpty
+          ? 1
+          : isLastPage
+              ? count + 1
+              : count,
       itemBuilder: (context, index) {
-        if (index < count) {
+        if (isLastPage) {
+          if (!isListEmpty && index < count) {}
+        }
+        if (isLastPage && index >= items.length) {
+          return AddTimerButton();
+        } else {
           return CircularTimerButton(
             id: items[index].id,
             title: items[index].title,
@@ -182,9 +204,6 @@ class _Page extends StatelessWidget {
             minutes: items[index].minutes,
             seconds: items[index].seconds,
           );
-        } else {
-          // return TimePickerSpinner();
-          return AddTimerButton();
         }
       },
     );

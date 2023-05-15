@@ -13,6 +13,7 @@ class HomeScreen extends StatelessWidget {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         key: Provider.of<TimerViewModel>(context).scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.white,

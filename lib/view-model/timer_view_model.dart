@@ -24,23 +24,27 @@ class TimerViewModel with ChangeNotifier {
     Timer(id: 't4', title: 'Timer', hours: 1, minutes: 0, seconds: 0),
     Timer(id: 't5', title: 'Gym', hours: 0, minutes: 0, seconds: 40),
     Timer(id: 't6', title: 'Test 2', hours: 0, minutes: 0, seconds: 10),
-    Timer(id: 't7', title: 'Test 3', hours: 0, minutes: 15, seconds: 0),
+    // Timer(id: 't7', title: 'Test 3', hours: 0, minutes: 15, seconds: 0),
   ];
 
   List<List<Timer>> getPages() {
-    int pageCount = (timerList.length / 6).ceil();
+    int pageCount = ((timerList.length + 1) / 6).ceil();
 
     List<List<Timer>> pages = [];
     for (var i = 0; i < pageCount; i++) {
-      List<Timer> subList;
-      if (i == 0) {
-        subList = timerList.sublist(i, 6);
-      } else if (i == pageCount - 1) {
-        subList = timerList.sublist(i * 6);
+      if (i * 6 < timerList.length) {
+        List<Timer> subList;
+        if (i == 0) {
+          subList = timerList.sublist(i, 6);
+        } else if (i == pageCount - 1) {
+          subList = timerList.sublist(i * 6);
+        } else {
+          subList = timerList.sublist(i * 6, i * 6 + 6);
+        }
+        pages.add(subList);
       } else {
-        subList = timerList.sublist(i * 6, i * 6 + 6);
+        pages.add([]);
       }
-      pages.add(subList);
     }
     return pages;
   }
