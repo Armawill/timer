@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:isolate';
+
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+// import 'package:elegant_notification/elegant_notification.dart';
+// import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:timer/model/overlay_service.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 
 class CircularTimer extends StatefulWidget {
@@ -11,14 +17,21 @@ class CircularTimer extends StatefulWidget {
 }
 
 class _CircularTimerState extends State<CircularTimer> {
+  // OverlayEntry? entry;
   void printTimeWithTitle(Duration duration, String title) {
     print('$duration/n$title');
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     const paddingTop = 40.0;
-    final timerWidth = MediaQuery.of(context).size.width * 0.8;
+    // final timerWidth = MediaQuery.of(context).size.width * 0.8;
     return Stack(
       children: [
         Padding(
@@ -33,12 +46,18 @@ class _CircularTimerState extends State<CircularTimer> {
                 : Colors.red,
             ringColor: Colors.grey.shade300,
             isReverse: true,
+            // autoStart: false,
             isReverseAnimation: true,
             textStyle: const TextStyle(fontSize: 28),
             controller: Provider.of<TimerViewModel>(context).controller,
-            onComplete: () =>
-                Provider.of<TimerViewModel>(context, listen: false)
-                    .onTimerCompleted(),
+            onStart: () {
+              Provider.of<TimerViewModel>(context).scheduledNotification();
+            },
+            onChange: (value) {},
+            onComplete: () {
+              Provider.of<TimerViewModel>(context, listen: false)
+                  .onTimerCompleted(context);
+            },
           ),
         ),
         Positioned.fill(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/timer.dart';
@@ -7,7 +8,6 @@ import 'package:timer/view-model/timer_view_model.dart';
 import 'circular_timer_button.dart';
 import 'add_timer_button.dart';
 import 'circular_timer.dart';
-// import 'time_spinner.dart';
 
 class TimerTab extends StatefulWidget {
   const TimerTab({super.key});
@@ -24,6 +24,7 @@ class _TimerTabState extends State<TimerTab> {
       children: [
         Column(
           children: [
+            // CircularTimer(),
             Provider.of<TimerViewModel>(context).isTimerStarted
                 ? CircularTimer()
                 : const _TimePickerSpinner(),
@@ -217,12 +218,12 @@ class _StartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomCenter,
-      padding: EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
         height: 50,
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             Provider.of<TimerViewModel>(context, listen: false).onTimerStart();
           },
           style: ButtonStyle(

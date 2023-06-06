@@ -43,17 +43,21 @@ dependencies:
   provider: ^6.0.5
   infinite_listview: ^1.1.0
   scrollable_positioned_list: ^0.3.8
-  time_picker_spinner_pop_up: ^1.2.0
+  time_picker_spinner_pop_up: ^1.2.0  
+  flutter_ringtone_player: ^3.2.0
+  
+  flutter_local_notifications: ^14.0.0+2
+  rxdart: ^0.27.7
+  flutter_native_timezone: ^2.0.0
+  workmanager: ^0.5.1
+  flutter_overlay_window: ^0.4.3
+  intl: ^0.18.1
+  audioplayers: ^4.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the
@@ -68,8 +72,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - packages/timezone/data/latest.tzf
+    - assets/images/app_icon.png
+    - assets/audio/musical_alert_notification.wav
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
