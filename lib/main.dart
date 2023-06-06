@@ -6,6 +6,7 @@ import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
 
+import 'model/notification_service.dart';
 import 'view/widgets/timer_tab.dart';
 
 void main() async {
@@ -74,17 +75,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getPermission();
-    // OverlayService.listener();
-    // NotificationService.initialize();
-    // listenNotifications();
+
+    NotificationService.initialize();
+    listenNotifications();
   }
 
   getPermission() async {
     await OverlayService.initialize();
   }
 
-  // void listenNotifications() =>
-  //     NotificationService.onNotifications.stream.listen((payload) {});
+  void listenNotifications() =>
+      NotificationService.onNotifications.stream.listen((payload) {});
 
   @override
   Widget build(BuildContext context) {

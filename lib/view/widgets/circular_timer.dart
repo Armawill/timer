@@ -46,13 +46,9 @@ class _CircularTimerState extends State<CircularTimer> {
                 : Colors.red,
             ringColor: Colors.grey.shade300,
             isReverse: true,
-            // autoStart: false,
             isReverseAnimation: true,
             textStyle: const TextStyle(fontSize: 28),
             controller: Provider.of<TimerViewModel>(context).controller,
-            onStart: () {
-              Provider.of<TimerViewModel>(context).scheduledNotification();
-            },
             onChange: (value) {},
             onComplete: () {
               Provider.of<TimerViewModel>(context, listen: false)

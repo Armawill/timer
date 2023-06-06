@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timer/model/notification_service.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -147,7 +149,7 @@ class TimerViewModel with ChangeNotifier {
   void onTimerCancel() {
     _isTimerCanceled = true;
     _countDownController.reset();
-    // NotificationService.cancelAllNotifications();
+    NotificationService.cancelAllNotifications();
     notifyListeners();
   }
 
@@ -166,26 +168,22 @@ class TimerViewModel with ChangeNotifier {
   void onTimerStart() async {
     _isTimerCanceled = false;
     _isTimerStarted = true;
-
-    var targetTime = DateTime.now().add(Duration(seconds: getDuration()));
-    // NotificationService.showNotification(
-    //   id: 0,
-    //   title: 'Timer done',
-    //   body: DateFormat.Hms().format(targetTime),
-    // );
+    showNotification();
 
     notifyListeners();
   }
 
   void onTimerCompleted(BuildContext context) async {
-    // NotificationService.cancelAllNotifications();
     _isTimerStarted = false;
 
-    OverlayService.shareData({
-      'time': getTimeString(),
-    });
+    if (!_isTimerCanceled) {
+      NotificationService.cancelAllNotifications();
+      OverlayService.shareData({
+        'time': getTimeString(),
+      });
 
-    OverlayService.show();
+      OverlayService.show();
+    }
 
     // Workmanager().registerOneOffTask(
     //   'notification',
@@ -199,16 +197,13 @@ class TimerViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> scheduledNotification() async {
-    var timeString =
-        '${time.hour != 0 ? '${time.hour} h' : ''} ${time.minute != 0 ? '${time.minute} min' : ''} ${time.second != 0 ? '${time.second} sec' : ''}';
-
-    // await NotificationService.showNotification(
-    //   title: 'Timer done',
-    //   body: timeString,
-    //   scheduled: true,
-    //   interval: duration,
-    // );
+  Future<void> showNotification() async {
+    var targetTime = DateTime.now().add(Duration(seconds: getDuration()));
+    NotificationService.showNotification(
+      id: 0,
+      title: 'Timer',
+      body: 'Timer will end at ${DateFormat.Hms().format(targetTime)}',
+    );
   }
 
   // NotificationService.showScheduledNotification(
