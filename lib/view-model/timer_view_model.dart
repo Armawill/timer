@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timer/model/notification_service.dart';
@@ -6,49 +8,6 @@ import 'package:workmanager/workmanager.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:timer/model/overlay_service.dart';
 import 'package:timer/model/timer.dart';
-
-@pragma('vm:entry-point')
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    // await Isolate.run(() async {
-    // await Future.delayed(
-    //   Duration(seconds: 2),
-    // () {
-    switch (task) {
-      case 'timerNotification':
-        print("timerNotification was executed. inputData = $inputData");
-        if (inputData != null) {
-          // if (inputData['time'] != null) {
-          //   OverlayService.show();
-          // }
-
-          // NotificationService.showNotification(
-          //     title: 'timer done', body: inputData['time']);
-
-          // NotificationService.showNotification(
-          //   title: inputData['title'],
-          //   body: inputData['body'],
-          //   actionType: ActionType.KeepOnTop,
-          //   category: NotificationCategory.Alarm,
-          //   actionButtons: [
-          //     NotificationActionButton(
-          //       key: 'stop',
-          //       label: 'Stop',
-          //       actionType: ActionType.SilentAction,
-          //     )
-          //   ],
-          // );
-        }
-
-        break;
-      default:
-    }
-    //   },
-    // );
-    // });
-    return Future.value(true);
-  });
-}
 
 class TimerViewModel with ChangeNotifier {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -138,11 +97,7 @@ class TimerViewModel with ChangeNotifier {
     _time = selectedTime;
     currentTimerTitle = title;
     currentTimerId = id;
-    await Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
-    // SystemAlertWindow.closeSystemWindow(prefMode: SystemWindowPrefMode.OVERLAY);
+
     notifyListeners();
   }
 
@@ -168,7 +123,39 @@ class TimerViewModel with ChangeNotifier {
   void onTimerStart() async {
     _isTimerCanceled = false;
     _isTimerStarted = true;
-    showNotification();
+    // showNotification();
+    var targetTime = DateTime.now().add(Duration(seconds: getDuration()));
+
+    await Isolate.run(() {
+      Future.delayed(Duration(seconds: getDuration()), () {
+        // OverlayService.shareData({
+        //   'time': getTimeString(),
+        // });
+
+        // OverlayService.show();
+        NotificationService.showNotification(
+          id: 0,
+          title: 'Timer',
+          body: 'Timer will end at ${targetTime}',
+        );
+      });
+    });
+
+    // Workmanager().registerOneOffTask(
+    //   'notification',
+    //   'timerNotification',
+    //   inputData: {
+    //     'targetTime': DateFormat.Hms().format(targetTime),
+    //   },
+    // );
+    // Workmanager().registerOneOffTask(
+    //   'overlay',
+    //   'overlayShow',
+    //   inputData: {
+    //     'delay': getDuration(),
+    //     'time': getTimeString(),
+    //   },
+    // );
 
     notifyListeners();
   }
@@ -178,21 +165,7 @@ class TimerViewModel with ChangeNotifier {
 
     if (!_isTimerCanceled) {
       NotificationService.cancelAllNotifications();
-      OverlayService.shareData({
-        'time': getTimeString(),
-      });
-
-      OverlayService.show();
     }
-
-    // Workmanager().registerOneOffTask(
-    //   'notification',
-    //   'timerNotification',
-    //   inputData: {
-    //     'time': getTimeString(),
-    //   },
-    //   //initialDelay: Duration(seconds: getDuration()),
-    // );
 
     notifyListeners();
   }

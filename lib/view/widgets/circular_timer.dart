@@ -1,12 +1,6 @@
-import 'dart:io';
-import 'dart:isolate';
-
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
-// import 'package:elegant_notification/elegant_notification.dart';
-// import 'package:elegant_notification/resources/arrays.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:timer/model/overlay_service.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 
 class CircularTimer extends StatefulWidget {

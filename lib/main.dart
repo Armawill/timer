@@ -1,16 +1,66 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/overlay_service.dart';
 
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'model/notification_service.dart';
 import 'view/widgets/timer_tab.dart';
 
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    // await Isolate.run(() async {
+    // await Future.delayed(
+    //   Duration(seconds: 2),
+    // () {
+    switch (task) {
+      case 'overlayShow':
+        log("overlayShow was executed. inputData = $inputData");
+        if (inputData != null) {
+          if (inputData['delay'] != null && inputData['time'] != null) {
+            await Future.delayed(Duration(seconds: inputData['delay']), () {
+              OverlayService.shareData({
+                'time': inputData['time'],
+              });
+              OverlayService.show();
+            });
+          }
+        }
+
+        break;
+      case 'timerNotification':
+        print("timerNotification was executed. inputData = $inputData");
+        if (inputData != null) {
+          if (inputData['targetTime'] != null) {
+            NotificationService.showNotification(
+              id: 0,
+              title: 'Timer',
+              body: 'Timer will end at ${inputData['targetTime']}',
+            );
+          }
+        }
+        break;
+    }
+    //   },
+    // );
+    // });
+    return Future.value(true);
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Workmanager().initialize(
+    callbackDispatcher,
+    // isInDebugMode: true,
+  );
   // await NotificationService.initialize();
   runApp(const MyApp());
 }
@@ -21,7 +71,7 @@ void overlayMain() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MaterialApp(
-      debugShowCheckedModeBanner: false,
+      // debugShowCheckedModeBanner: false,
       home: OverlayWidget(),
     ),
   );
@@ -78,6 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     NotificationService.initialize();
     listenNotifications();
+
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle())
   }
 
   getPermission() async {
