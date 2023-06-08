@@ -49,10 +49,10 @@ dependencies:
   flutter_local_notifications: ^14.0.0+2
   rxdart: ^0.27.7
   flutter_native_timezone: ^2.0.0
-  workmanager: ^0.5.1
   flutter_overlay_window: ^0.4.3
   intl: ^0.18.1
   audioplayers: ^4.1.0
+  
 
 dev_dependencies:
   flutter_test:

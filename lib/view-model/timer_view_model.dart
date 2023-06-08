@@ -1,23 +1,50 @@
+import 'dart:developer';
 import 'dart:isolate';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:timer/model/notification_service.dart';
-import 'package:workmanager/workmanager.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:timer/model/overlay_service.dart';
 import 'package:timer/model/timer.dart';
 
+void createIsolate(List<Object> args) async {
+  final rootIsolateToken = args[0] as RootIsolateToken;
+  final delay = args[1] as int;
+  final time = args[2] as String;
+  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+
+  Future.delayed(Duration(milliseconds: delay), () {
+    OverlayService.shareData({
+      'time': time,
+    });
+
+    OverlayService.show();
+    // NotificationService.showNotification(
+    //   id: 0,
+    //   title: 'Timer',
+    //   body: 'Timer will end at ',
+    // );
+  });
+
+  // });
+}
+
 class TimerViewModel with ChangeNotifier {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
+  late Isolate isolate;
+  RootIsolateToken rootIsolateToken = RootIsolateToken.instance!;
 
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
   var _isTimerCanceled = false;
   String? currentTimerTitle;
   String? currentTimerId;
+  DateTime _targetTime = DateTime.now();
+  int _newDuration = 0;
 
   final CountDownController _countDownController = CountDownController();
   CountDownController get controller => _countDownController;
@@ -68,8 +95,15 @@ class TimerViewModel with ChangeNotifier {
     return pages;
   }
 
+  ///Return duration in seconds
   int getDuration() {
-    final timestamp = _time.second + _time.minute * 60 + _time.hour * 3600;
+    final timestamp = (_time.second + _time.minute * 60 + _time.hour * 3600);
+    return timestamp;
+  }
+
+  int getDurationInMilliseconds() {
+    final timestamp =
+        (_time.second + _time.minute * 60 + _time.hour * 3600) * 1000;
     return timestamp;
   }
 
@@ -104,59 +138,49 @@ class TimerViewModel with ChangeNotifier {
   void onTimerCancel() {
     _isTimerCanceled = true;
     _countDownController.reset();
+    isolate.kill();
     NotificationService.cancelAllNotifications();
     notifyListeners();
   }
 
   void onTimerPause() {
     _countDownController.pause();
+    isolate.kill();
+    _newDuration = DateTime.now().difference(_targetTime).inMilliseconds.abs();
+    log('pause ${_newDuration}');
     // NotificationService.cancelAllNotifications();
     notifyListeners();
   }
 
-  void onTimerResume() {
+  void onTimerResume() async {
     _countDownController.resume();
-
+    _targetTime = DateTime.now().add(Duration(milliseconds: _newDuration));
+    isolate = await Isolate.spawn(createIsolate, [
+      rootIsolateToken,
+      _newDuration,
+      getTimeString(),
+    ]);
     notifyListeners();
+  }
+
+  void overlayIsolate(int duration) async {
+    isolate = await Isolate.spawn(createIsolate, [
+      rootIsolateToken,
+      duration,
+      getTimeString(),
+    ]);
   }
 
   void onTimerStart() async {
     _isTimerCanceled = false;
     _isTimerStarted = true;
     // showNotification();
-    var targetTime = DateTime.now().add(Duration(seconds: getDuration()));
-
-    await Isolate.run(() {
-      Future.delayed(Duration(seconds: getDuration()), () {
-        // OverlayService.shareData({
-        //   'time': getTimeString(),
-        // });
-
-        // OverlayService.show();
-        NotificationService.showNotification(
-          id: 0,
-          title: 'Timer',
-          body: 'Timer will end at ${targetTime}',
-        );
-      });
-    });
-
-    // Workmanager().registerOneOffTask(
-    //   'notification',
-    //   'timerNotification',
-    //   inputData: {
-    //     'targetTime': DateFormat.Hms().format(targetTime),
-    //   },
-    // );
-    // Workmanager().registerOneOffTask(
-    //   'overlay',
-    //   'overlayShow',
-    //   inputData: {
-    //     'delay': getDuration(),
-    //     'time': getTimeString(),
-    //   },
-    // );
-
+    var targetTime =
+        DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
+    log('Duration ${getDuration() * 1000}');
+    log('targetTime $targetTime');
+    _targetTime = targetTime;
+    overlayIsolate(getDuration() * 1000);
     notifyListeners();
   }
 
@@ -171,7 +195,8 @@ class TimerViewModel with ChangeNotifier {
   }
 
   Future<void> showNotification() async {
-    var targetTime = DateTime.now().add(Duration(seconds: getDuration()));
+    var targetTime =
+        DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
     NotificationService.showNotification(
       id: 0,
       title: 'Timer',
