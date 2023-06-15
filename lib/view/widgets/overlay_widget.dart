@@ -1,6 +1,5 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/overlay_service.dart';
@@ -37,7 +36,7 @@ class _OverlayWidgetState extends State<OverlayWidget> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,7 +67,10 @@ class _StopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: OverlayService.close,
+      onPressed: () {
+        OverlayService.close();
+        FlutterBackgroundService().invoke('setAsBackground');
+      },
       child: const Text(
         'Stop',
         style: TextStyle(
@@ -120,14 +122,12 @@ class _TimerInfoState extends State<_TimerInfo> {
   @override
   void initState() {
     FlutterOverlayWindow.overlayListener.listen((data) {
-      log("Current Event: $data");
       if (data != null) {
-        log("Current data['time']: ${data['time']}");
         if (data['time'] != null) {
           time = data['time'];
           Provider.of<EditTimerViewModel>(context, listen: false)
               .setTimeString(time);
-          OverlayService.play();
+          FlutterBackgroundService().invoke('setAsForeground');
         }
       }
     });

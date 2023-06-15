@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 class EditTimerViewModel with ChangeNotifier {
@@ -17,7 +15,6 @@ class EditTimerViewModel with ChangeNotifier {
   String get title => _title;
 
   String get timeString {
-    log('_timeString: $_timeString');
     return _timeString;
   }
 

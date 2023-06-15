@@ -1,42 +1,15 @@
-import 'dart:developer';
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer/model/notification_service.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:timer/model/overlay_service.dart';
 import 'package:timer/model/timer.dart';
 
-void createIsolate(List<Object> args) async {
-  final rootIsolateToken = args[0] as RootIsolateToken;
-  final delay = args[1] as int;
-  final time = args[2] as String;
-  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-
-  Future.delayed(Duration(milliseconds: delay), () {
-    OverlayService.shareData({
-      'time': time,
-    });
-
-    OverlayService.show();
-    // NotificationService.showNotification(
-    //   id: 0,
-    //   title: 'Timer',
-    //   body: 'Timer will end at ',
-    // );
-  });
-
-  // });
-}
-
 class TimerViewModel with ChangeNotifier {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
-  late Isolate isolate;
-  RootIsolateToken rootIsolateToken = RootIsolateToken.instance!;
 
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
@@ -135,52 +108,50 @@ class TimerViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void onTimerCancel() {
+  void onTimerCancel() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isShow', false);
+    await prefs.setBool('setAsForeground', false);
+
     _isTimerCanceled = true;
     _countDownController.reset();
-    isolate.kill();
     NotificationService.cancelAllNotifications();
     notifyListeners();
   }
 
-  void onTimerPause() {
+  void onTimerPause() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     _countDownController.pause();
-    isolate.kill();
     _newDuration = DateTime.now().difference(_targetTime).inMilliseconds.abs();
-    log('pause ${_newDuration}');
-    // NotificationService.cancelAllNotifications();
+    await prefs.setString('targetTime', 'null');
     notifyListeners();
   }
 
   void onTimerResume() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     _countDownController.resume();
     _targetTime = DateTime.now().add(Duration(milliseconds: _newDuration));
-    isolate = await Isolate.spawn(createIsolate, [
-      rootIsolateToken,
-      _newDuration,
-      getTimeString(),
-    ]);
+    await prefs.setString('targetTime', DateFormat.Hms().format(_targetTime));
     notifyListeners();
-  }
-
-  void overlayIsolate(int duration) async {
-    isolate = await Isolate.spawn(createIsolate, [
-      rootIsolateToken,
-      duration,
-      getTimeString(),
-    ]);
   }
 
   void onTimerStart() async {
     _isTimerCanceled = false;
     _isTimerStarted = true;
-    // showNotification();
     var targetTime =
         DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
-    log('Duration ${getDuration() * 1000}');
-    log('targetTime $targetTime');
     _targetTime = targetTime;
-    overlayIsolate(getDuration() * 1000);
+
+    OverlayService.shareData({
+      'time': getTimeString(),
+    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('targetTime', DateFormat.Hms().format(targetTime));
+    await prefs.setString('time', getTimeString());
+    await prefs.setInt('duration', getDurationInMilliseconds());
+    await prefs.setBool('isShow', true);
+    await prefs.setBool('setAsForeground', true);
+
     notifyListeners();
   }
 
@@ -203,12 +174,4 @@ class TimerViewModel with ChangeNotifier {
       body: 'Timer will end at ${DateFormat.Hms().format(targetTime)}',
     );
   }
-
-  // NotificationService.showScheduledNotification(
-  //   title: 'Timer done',
-  //   body: timeString,
-  //   payload: 'Timer',
-  //   scheduledDate: scheduledDate,
-  // );
-  // }
 }

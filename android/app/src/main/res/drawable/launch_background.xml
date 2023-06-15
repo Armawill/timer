@@ -9,4 +9,9 @@
             android:gravity="center"
             android:src="@mipmap/app_icon" />
     </item>
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@mipmap/ic_bg_service_small" />
+    </item>
 </layer-list>

@@ -1,7 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timer/model/background_service.dart';
 import 'package:timer/model/overlay_service.dart';
 
 import 'package:timer/view-model/edit_timer_view_model.dart';
@@ -11,17 +12,28 @@ import 'package:timer/view/widgets/overlay_widget.dart';
 import 'model/notification_service.dart';
 import 'view/widgets/timer_tab.dart';
 
+final service = FlutterBackgroundService();
+
 @pragma('vm:entry-point')
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await NotificationService.initialize();
+  await NotificationService.initialize();
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.clear();
+  await OverlayService.initialize();
+
   runApp(const MyApp());
 }
 
+// getOverlayPermission() async {
+//   await OverlayService.initialize();
+// }
+
 // overlay entry point
 @pragma("vm:entry-point")
-void overlayMain() {
+void overlayMain() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await BackgroundService.initilizeService();
   runApp(
     MaterialApp(
       // debugShowCheckedModeBanner: false,
@@ -77,20 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getPermission();
 
-    NotificationService.initialize();
-    listenNotifications();
+    // NotificationService.initialize();
+    // listenNotifications();
 
     // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle())
   }
 
-  getPermission() async {
-    await OverlayService.initialize();
-  }
-
-  void listenNotifications() =>
-      NotificationService.onNotifications.stream.listen((payload) {});
+  // void listenNotifications() =>
+  //     NotificationService.onNotifications.stream.listen((payload) {});
 
   @override
   Widget build(BuildContext context) {
