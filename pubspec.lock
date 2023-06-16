@@ -282,14 +282,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  infinite_listview:
-    dependency: "direct main"
-    description:
-      name: infinite_listview
-      sha256: f6062c1720eb59be553dfa6b89813d3e8dd2f054538445aaa5edaddfa5195ce6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   intl:
     dependency: "direct main"
     description:
@@ -346,6 +338,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  page_view_dot_indicator:
+    dependency: "direct main"
+    description:
+      name: page_view_dot_indicator
+      sha256: "072aa63f4fe94351d921ea0f83ae86089aed9b53a624ae34317e96caff73a635"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   path:
     dependency: transitive
     description:
@@ -450,14 +450,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.27.7"
-  scrollable_positioned_list:
-    dependency: "direct main"
-    description:
-      name: scrollable_positioned_list
-      sha256: "1b54d5f1329a1e263269abc9e2543d90806131aa14fe7c6062a8054d57249287"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.8"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -575,14 +567,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.1"
-  time_picker_spinner_pop_up:
-    dependency: "direct main"
-    description:
-      name: time_picker_spinner_pop_up
-      sha256: cc7b7442b6318cef400c329430955d9203893cf4c55c6e28192240ca5bb8d8a6
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   timezone:
     dependency: transitive
     description:

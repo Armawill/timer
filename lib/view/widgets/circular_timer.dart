@@ -43,11 +43,15 @@ class _CircularTimerState extends State<CircularTimer> {
             isReverseAnimation: true,
             textStyle: const TextStyle(fontSize: 28),
             controller: Provider.of<TimerViewModel>(context).controller,
-            onChange: (value) {},
             onComplete: () {
               Provider.of<TimerViewModel>(context, listen: false)
                   .onTimerCompleted(context);
             },
+            timeFormatterFunction: (defaultFormatterFunction, duration) {
+              return Provider.of<TimerViewModel>(context, listen: false)
+                  .getRemainingDuration(duration.inSeconds);
+            },
+            strokeCap: StrokeCap.round,
           ),
         ),
         Positioned.fill(

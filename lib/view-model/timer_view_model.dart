@@ -36,6 +36,21 @@ class TimerViewModel with ChangeNotifier {
     return timeString;
   }
 
+  ///Return remaining duration in seconds
+  String getRemainingDuration(int duration) {
+    var newDuration = duration;
+    if (duration < getDuration()) {
+      newDuration = duration + 1;
+    }
+    final int hours = newDuration ~/ 3600;
+    final int minutes = (newDuration % 3600) ~/ 60;
+    final int seconds = ((newDuration % 3600) % 60);
+    final hoursStr = '${hours < 10 ? '0$hours' : hours}';
+    final minutesStr = '${minutes < 10 ? '0$minutes' : minutes}';
+    final secondsStr = '${seconds < 10 ? '0$seconds' : seconds}';
+    return '$hoursStr:$minutesStr:$secondsStr';
+  }
+
   List<Timer> timerList = [
     Timer(id: 't1', title: 'Plank', hours: 0, minutes: 0, seconds: 2),
     Timer(id: 't2', title: 'Test', hours: 0, minutes: 5, seconds: 0),
@@ -66,6 +81,16 @@ class TimerViewModel with ChangeNotifier {
       }
     }
     return pages;
+  }
+
+  int _selectedPage = 0;
+  int get selectedPage => _selectedPage;
+
+  PageController _pageController = PageController(initialPage: 0);
+  PageController get pageController => _pageController;
+  void onPageChanged(int page) {
+    _selectedPage = page;
+    notifyListeners();
   }
 
   ///Return duration in seconds
@@ -158,9 +183,9 @@ class TimerViewModel with ChangeNotifier {
   void onTimerCompleted(BuildContext context) async {
     _isTimerStarted = false;
 
-    if (!_isTimerCanceled) {
-      NotificationService.cancelAllNotifications();
-    }
+    // if (!_isTimerCanceled) {
+    //   NotificationService.cancelAllNotifications();
+    // }
 
     notifyListeners();
   }

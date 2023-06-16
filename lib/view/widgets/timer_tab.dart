@@ -4,6 +4,7 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/timer.dart';
 import 'package:timer/view-model/timer_view_model.dart';
+import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 
 import 'circular_timer_button.dart';
 import 'add_timer_button.dart';
@@ -19,7 +20,6 @@ class TimerTab extends StatefulWidget {
 class _TimerTabState extends State<TimerTab> {
   @override
   Widget build(BuildContext context) {
-    var time = Provider.of<TimerViewModel>(context).time;
     return Stack(
       children: [
         Column(
@@ -137,13 +137,16 @@ class _TimePickerSpinner extends StatelessWidget {
   }
 }
 
-class _SavedTimers extends StatelessWidget {
+class _SavedTimers extends StatefulWidget {
   const _SavedTimers({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = PageController();
+  State<_SavedTimers> createState() => _SavedTimersState();
+}
 
+class _SavedTimersState extends State<_SavedTimers> {
+  @override
+  Widget build(BuildContext context) {
     final List<Widget> _pages = Provider.of<TimerViewModel>(context)
         .getPages()
         .map((page) => _Page(
@@ -152,12 +155,30 @@ class _SavedTimers extends StatelessWidget {
               isLastPage: page.length < 6,
             ))
         .toList();
-    int _activePage = 0;
 
-    return Container(
-      width: double.infinity,
-      height: MediaQuery.of(context).size.height * 0.33,
-      child: PageView(controller: controller, children: _pages),
+    return Column(
+      children: [
+        Container(
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.33,
+          child: PageView(
+            controller: Provider.of<TimerViewModel>(context).pageController,
+            children: _pages,
+            onPageChanged: (page) {
+              Provider.of<TimerViewModel>(context, listen: false)
+                  .onPageChanged(page);
+            },
+          ),
+        ),
+        PageViewDotIndicator(
+          currentItem: Provider.of<TimerViewModel>(context).selectedPage,
+          count: _pages.length,
+          unselectedColor: Colors.grey,
+          selectedColor: Colors.red,
+          duration: const Duration(milliseconds: 200),
+          size: Size(8, 8),
+        ),
+      ],
     );
   }
 }
