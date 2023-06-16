@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:provider/provider.dart';
-import 'package:timer/model/overlay_service.dart';
-import 'package:timer/view-model/edit_timer_view_model.dart';
+import 'package:timer/view-model/overlay_view_model.dart';
 
 class OverlayWidget extends StatefulWidget {
   const OverlayWidget({super.key});
@@ -21,7 +18,7 @@ class _OverlayWidgetState extends State<OverlayWidget> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => EditTimerViewModel(),
+      create: (context) => OverlayViewModel(),
       child: Container(
         padding: EdgeInsets.only(
           top: 46 +
@@ -36,7 +33,7 @@ class _OverlayWidgetState extends State<OverlayWidget> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
-          child: Padding(
+          child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,10 +64,8 @@ class _StopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () {
-        OverlayService.close();
-        FlutterBackgroundService().invoke('setAsBackground');
-      },
+      onPressed:
+          Provider.of<OverlayViewModel>(context, listen: false).onStopped,
       child: const Text(
         'Stop',
         style: TextStyle(
@@ -117,26 +112,15 @@ class _TimerInfo extends StatefulWidget {
 }
 
 class _TimerInfoState extends State<_TimerInfo> {
-  String time = 'null';
-
   @override
   void initState() {
-    FlutterOverlayWindow.overlayListener.listen((data) {
-      if (data != null) {
-        if (data['time'] != null) {
-          time = data['time'];
-          Provider.of<EditTimerViewModel>(context, listen: false)
-              .setTimeString(time);
-          FlutterBackgroundService().invoke('setAsForeground');
-        }
-      }
-    });
+    Provider.of<OverlayViewModel>(context, listen: false).listenOverlay();
     super.initState();
   }
 
   @override
   void dispose() {
-    FlutterOverlayWindow.disposeOverlayListener();
+    Provider.of<OverlayViewModel>(context, listen: false).dispose();
     super.dispose();
   }
 
@@ -153,7 +137,7 @@ class _TimerInfoState extends State<_TimerInfo> {
           ),
         ),
         TextSpan(
-          text: Provider.of<EditTimerViewModel>(context).timeString,
+          text: Provider.of<OverlayViewModel>(context).timeString,
           style: const TextStyle(
             color: Colors.grey,
           ),

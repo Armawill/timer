@@ -10,7 +10,9 @@ import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
+import 'view/widgets/custom_tab_bar.dart';
 import 'view/widgets/timer_tab.dart';
+import 'view/widgets/top_menu.dart';
 
 final service = FlutterBackgroundService();
 
@@ -113,25 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
         key: Provider.of<TimerViewModel>(context).scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: const TabBar(
-            labelStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-            labelColor: Colors.black,
-            indicatorColor: Colors.red,
-            indicatorWeight: 3.0,
-            tabs: [
-              Tab(
-                text: 'Timer',
-              ),
-              Tab(
-                text: 'Sequence',
-              ),
-            ],
-          ),
+          title: const TopMenu(),
+          bottom: const CustomTabBar(),
         ),
-        body: TabBarView(children: [
+        body: const TabBarView(children: [
           TimerTab(),
           Center(
             child: Text('Work in progress'),
