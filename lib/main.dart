@@ -3,13 +3,12 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer/model/background_service.dart';
+import 'package:timer/model/local_storage_service.dart';
 import 'package:timer/model/overlay_service.dart';
 
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
-
-import 'model/notification_service.dart';
 import 'view/widgets/timer_tab.dart';
 
 final service = FlutterBackgroundService();
@@ -17,7 +16,8 @@ final service = FlutterBackgroundService();
 @pragma('vm:entry-point')
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService.initialize();
+  await LocalStorageService.initialize();
+  // await NotificationService.initialize();
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.clear();
   await OverlayService.initialize();

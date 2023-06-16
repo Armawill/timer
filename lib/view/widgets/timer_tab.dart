@@ -24,7 +24,6 @@ class _TimerTabState extends State<TimerTab> {
       children: [
         Column(
           children: [
-            // CircularTimer(),
             Provider.of<TimerViewModel>(context).isTimerStarted
                 ? CircularTimer()
                 : const _TimePickerSpinner(),

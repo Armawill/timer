@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timer/model/local_storage_service.dart';
 import 'package:timer/model/notification_service.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -8,6 +9,10 @@ import 'package:timer/model/overlay_service.dart';
 import 'package:timer/model/timer.dart';
 
 class TimerViewModel with ChangeNotifier {
+  TimerViewModel() {
+    loadTimers();
+  }
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
 
@@ -52,15 +57,22 @@ class TimerViewModel with ChangeNotifier {
   }
 
   List<Timer> timerList = [
-    Timer(id: 't1', title: 'Plank', hours: 0, minutes: 0, seconds: 2),
-    Timer(id: 't2', title: 'Test', hours: 0, minutes: 5, seconds: 0),
-    Timer(id: 't3', title: 'Other', hours: 0, minutes: 10, seconds: 0),
-    Timer(id: 't4', title: 'Timer', hours: 1, minutes: 0, seconds: 0),
-    Timer(id: 't5', title: 'Gym', hours: 0, minutes: 0, seconds: 40),
-    Timer(id: 't6', title: 'Test 2', hours: 0, minutes: 0, seconds: 10),
+    // Timer(id: 't1', title: 'Plank', hours: 0, minutes: 0, seconds: 2),
+    // Timer(id: 't2', title: 'Test', hours: 0, minutes: 5, seconds: 0),
+    // Timer(id: 't3', title: 'Other', hours: 0, minutes: 10, seconds: 0),
+    // Timer(id: 't4', title: 'Timer', hours: 1, minutes: 0, seconds: 0),
+    // Timer(id: 't5', title: 'Gym', hours: 0, minutes: 0, seconds: 40),
+    // Timer(id: 't6', title: 'Test 2', hours: 0, minutes: 0, seconds: 10),
     // Timer(id: 't7', title: 'Test 3', hours: 0, minutes: 15, seconds: 0),
   ];
 
+  /// Loads timers from local storage
+  void loadTimers() async {
+    timerList = await LocalStorageService.load();
+    notifyListeners();
+  }
+
+  /// Returns list of pages which contain timer list
   List<List<Timer>> getPages() {
     int pageCount = ((timerList.length + 1) / 6).ceil();
 
@@ -69,7 +81,11 @@ class TimerViewModel with ChangeNotifier {
       if (i * 6 < timerList.length) {
         List<Timer> subList;
         if (i == 0) {
-          subList = timerList.sublist(i, 6);
+          if (timerList.length >= 6) {
+            subList = timerList.sublist(i, 6);
+          } else {
+            subList = timerList;
+          }
         } else if (i == pageCount - 1) {
           subList = timerList.sublist(i * 6);
         } else {
@@ -88,6 +104,7 @@ class TimerViewModel with ChangeNotifier {
 
   PageController _pageController = PageController(initialPage: 0);
   PageController get pageController => _pageController;
+
   void onPageChanged(int page) {
     _selectedPage = page;
     notifyListeners();
@@ -99,6 +116,7 @@ class TimerViewModel with ChangeNotifier {
     return timestamp;
   }
 
+  ///Return duration in milliseconds
   int getDurationInMilliseconds() {
     final timestamp =
         (_time.second + _time.minute * 60 + _time.hour * 3600) * 1000;
@@ -109,15 +127,17 @@ class TimerViewModel with ChangeNotifier {
 
   void onTimerAdded(String title, DateTime time) {
     var id = DateTime.now().toIso8601String();
-    timerList.add(
-      Timer(
-        id: id,
-        title: title,
-        hours: time.hour,
-        minutes: time.minute,
-        seconds: time.second,
-      ),
+    final timer = Timer(
+      id: id,
+      title: title,
+      hours: time.hour,
+      minutes: time.minute,
+      seconds: time.second,
     );
+    timerList.add(
+      timer,
+    );
+    LocalStorageService.add(timer);
     currentTimerId = id;
     currentTimerTitle = title;
     onTimerSelected(time);
