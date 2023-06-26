@@ -10,7 +10,7 @@ class LocalStorageService {
   }
 
   /// Add timer to the Hive box
-  static void add(Timer timer) async {
+  static void save(Timer timer) async {
     var box = await Hive.openBox<Timer>(_timerBox);
     await box.put(timer.id, timer);
     // box.close();
@@ -43,37 +43,5 @@ class LocalStorageService {
     });
     // box.close();
     return list;
-  }
-}
-
-class TimerAdapter extends TypeAdapter<Timer> {
-  final _typeId = 0;
-
-  @override
-  int get typeId => _typeId;
-
-  @override
-  Timer read(BinaryReader reader) {
-    final id = reader.readString();
-    final title = reader.readString();
-    final hours = reader.readInt();
-    final minutes = reader.readInt();
-    final seconds = reader.readInt();
-    return Timer(
-      id: id,
-      title: title,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, Timer obj) {
-    writer.writeString(obj.id);
-    writer.writeString(obj.title);
-    writer.writeInt(obj.hours);
-    writer.writeInt(obj.minutes);
-    writer.writeInt(obj.seconds);
   }
 }

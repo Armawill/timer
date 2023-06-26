@@ -34,7 +34,20 @@ class TimerViewModel with ChangeNotifier {
 
   set isShow(bool value) => _isShow = value;
 
+  bool _isEditMode = false;
+  bool get isEditMode => _isEditMode;
+
+  bool _isCheckedAll = false;
+  bool get isCheckedAll => _isCheckedAll;
+
+  bool _isAnyTimerChecked = false;
+  bool get isAnyTimerChecked => _isAnyTimerChecked;
+
   DateTime get time => _time;
+
+  int _countOfCheckedTimers = 0;
+  int get countOfCheckedTimers => _countOfCheckedTimers;
+
   String getTimeString() {
     var timeString =
         '${time.hour != 0 ? '${time.hour} h' : ''} ${time.minute != 0 ? '${time.minute} min' : ''} ${time.second != 0 ? '${time.second} sec' : ''}';
@@ -74,7 +87,9 @@ class TimerViewModel with ChangeNotifier {
 
   /// Returns list of pages which contain timer list
   List<List<Timer>> getPages() {
-    int pageCount = ((timerList.length + 1) / 6).ceil();
+    int pageCount = _isEditMode
+        ? (timerList.length / 6).ceil()
+        : ((timerList.length + 1) / 6).ceil();
 
     List<List<Timer>> pages = [];
     for (var i = 0; i < pageCount; i++) {
@@ -102,7 +117,7 @@ class TimerViewModel with ChangeNotifier {
   int _selectedPage = 0;
   int get selectedPage => _selectedPage;
 
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
   PageController get pageController => _pageController;
 
   void onPageChanged(int page) {
@@ -125,6 +140,82 @@ class TimerViewModel with ChangeNotifier {
 
   bool get isTimerStarted => _isTimerStarted;
 
+  void turnOnEditMode([String? id]) {
+    if (id != null) {
+      changeCheckState(id, true);
+    }
+    _isEditMode = true;
+    notifyListeners();
+  }
+
+  void turnOffEditMode() {
+    _isEditMode = false;
+    _isCheckedAll = false;
+    _uncheckAll();
+    notifyListeners();
+  }
+
+  ///Changes [isChecked] param of all timers
+  void changeAllCheckState(bool? value) {
+    if (value != null) {
+      _isCheckedAll = value;
+      if (value) {
+        _checkAll();
+      } else {
+        _uncheckAll();
+      }
+      notifyListeners();
+    }
+  }
+
+  void _checkAll() {
+    for (var i = 0; i < timerList.length; i++) {
+      timerList
+          .replaceRange(i, i + 1, [timerList[i].copyWith(isChecked: true)]);
+    }
+    _isAnyTimerChecked = true;
+    _countOfCheckedTimers = timerList.length;
+  }
+
+  void _uncheckAll() {
+    for (var i = 0; i < timerList.length; i++) {
+      if (timerList[i].isChecked) {
+        timerList
+            .replaceRange(i, i + 1, [timerList[i].copyWith(isChecked: false)]);
+      }
+    }
+    _isAnyTimerChecked = false;
+    _countOfCheckedTimers = 0;
+  }
+
+  ///Changes [isChecked] param of timer by id
+  void changeCheckState(String id, bool value) {
+    var timer = timerList.firstWhere((item) => item.id == id);
+    int index = timerList.indexWhere((item) => item.id == id);
+    timerList
+        .replaceRange(index, index + 1, [timer.copyWith(isChecked: value)]);
+    if (value) {
+      _countOfCheckedTimers++;
+    } else {
+      _countOfCheckedTimers--;
+    }
+
+    if (timerList.every((element) => element.isChecked)) {
+      _isCheckedAll = true;
+    } else {
+      _isCheckedAll = false;
+    }
+
+    if (timerList.every((element) => !element.isChecked)) {
+      _isAnyTimerChecked = false;
+    } else {
+      if (!_isAnyTimerChecked) {
+        _isAnyTimerChecked = true;
+      }
+    }
+    notifyListeners();
+  }
+
   void onTimerAdded(String title, DateTime time) {
     var id = DateTime.now().toIso8601String();
     final timer = Timer(
@@ -133,14 +224,40 @@ class TimerViewModel with ChangeNotifier {
       hours: time.hour,
       minutes: time.minute,
       seconds: time.second,
+      isChecked: false,
     );
     timerList.add(
       timer,
     );
-    LocalStorageService.add(timer);
+    LocalStorageService.save(timer);
     currentTimerId = id;
     currentTimerTitle = title;
     onTimerSelected(time);
+    notifyListeners();
+  }
+
+  void onTimerEdited(String id, String title, DateTime time) {
+    var index = timerList.indexWhere((element) => element.id == id);
+    var timer = timerList.elementAt(index).copyWith(
+          title: title,
+          hours: time.hour,
+          minutes: time.minute,
+          seconds: time.second,
+        );
+    timerList.replaceRange(index, index + 1, [timer]);
+    _time = time;
+    LocalStorageService.save(timer);
+    notifyListeners();
+  }
+
+  void onTimerDeleted() {
+    timerList.removeWhere((element) {
+      if (element.isChecked) {
+        LocalStorageService.delete(element.id);
+      }
+      return element.isChecked;
+    });
+    _isEditMode = false;
     notifyListeners();
   }
 
@@ -202,11 +319,6 @@ class TimerViewModel with ChangeNotifier {
 
   void onTimerCompleted(BuildContext context) async {
     _isTimerStarted = false;
-
-    // if (!_isTimerCanceled) {
-    //   NotificationService.cancelAllNotifications();
-    // }
-
     notifyListeners();
   }
 

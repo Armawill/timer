@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:timer/model/background_service.dart';
 import 'package:timer/model/local_storage_service.dart';
 import 'package:timer/model/overlay_service.dart';
 import 'package:timer/utils/custom_scroll_behavior.dart';
-
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
@@ -107,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var isEditMode = Provider.of<TimerViewModel>(context).isEditMode;
     return DefaultTabController(
       initialIndex: 0,
       length: 2,
@@ -114,16 +115,21 @@ class _HomeScreenState extends State<HomeScreen> {
         resizeToAvoidBottomInset: false,
         key: Provider.of<TimerViewModel>(context).scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey.shade50,
           title: const TopMenu(),
           bottom: const CustomTabBar(),
+          elevation: 0,
         ),
-        body: const TabBarView(children: [
-          TimerTab(),
-          Center(
-            child: Text('Work in progress'),
-          ),
-        ]),
+        body: TabBarView(
+          physics:
+              isEditMode ? NeverScrollableScrollPhysics() : PageScrollPhysics(),
+          children: const [
+            TimerTab(),
+            Center(
+              child: Text('Work in progress'),
+            ),
+          ],
+        ),
       ),
     );
   }

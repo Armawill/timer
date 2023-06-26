@@ -1,8 +1,6 @@
+// library time_picker_spinner;
+
 import 'package:flutter/material.dart';
-// import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
-// import 'package:infinite_listview/infinite_listview.dart';
-// import 'package:provider/provider.dart';
-// import 'package:timer/view-model/timer_view_model.dart';
 import 'dart:math';
 
 class ItemScrollPhysics extends ScrollPhysics {
@@ -81,23 +79,25 @@ class TimePickerSpinner extends StatefulWidget {
   final double? spacing;
   final bool isForce2Digits;
   final TimePickerCallback? onTimeChange;
+  final bool isEnable;
 
-  TimePickerSpinner(
-      {Key? key,
-      this.time,
-      this.minutesInterval = 1,
-      this.secondsInterval = 1,
-      this.is24HourMode = true,
-      this.isShowSeconds = false,
-      this.highlightedTextStyle,
-      this.normalTextStyle,
-      this.itemHeight,
-      this.itemWidth,
-      this.alignment,
-      this.spacing,
-      this.isForce2Digits = false,
-      this.onTimeChange})
-      : super(key: key);
+  TimePickerSpinner({
+    Key? key,
+    this.time,
+    this.minutesInterval = 1,
+    this.secondsInterval = 1,
+    this.is24HourMode = true,
+    this.isShowSeconds = false,
+    this.highlightedTextStyle,
+    this.normalTextStyle,
+    this.itemHeight,
+    this.itemWidth,
+    this.alignment,
+    this.spacing,
+    this.isForce2Digits = false,
+    this.onTimeChange,
+    this.isEnable = true,
+  }) : super(key: key);
 
   @override
   _TimePickerSpinnerState createState() => _TimePickerSpinnerState();
@@ -117,7 +117,6 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
   bool isMinuteScrolling = false;
   bool isSecondsScrolling = false;
   bool isAPScrolling = false;
-  bool isTimeChanged = true;
 
   /// default settings
   TextStyle defaultHighlightTextStyle =
@@ -188,30 +187,6 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
         hour, minute, second);
   }
 
-  void getCurrentSelectedTime() {
-    currentTime = widget.time == null ? DateTime.now() : widget.time;
-
-    currentSelectedHourIndex =
-        (currentTime!.hour % (widget.is24HourMode ? 24 : 12)) + _getHourCount();
-    hourController.position
-        .correctPixels((currentSelectedHourIndex - 1) * _getItemHeight()!);
-    hourController.position.notifyListeners();
-
-    currentSelectedMinuteIndex =
-        (currentTime!.minute / widget.minutesInterval).floor() +
-            (isLoop(_getMinuteCount()) ? _getMinuteCount() : 1);
-    minuteController.position
-        .correctPixels((currentSelectedMinuteIndex - 1) * _getItemHeight()!);
-    minuteController.position.notifyListeners();
-
-    currentSelectedSecondIndex =
-        (currentTime!.second / widget.secondsInterval).floor() +
-            (isLoop(_getSecondCount()) ? _getSecondCount() : 1);
-    secondController.position
-        .correctPixels((currentSelectedSecondIndex - 1) * _getItemHeight()!);
-    secondController.position.notifyListeners();
-  }
-
   @override
   void initState() {
     currentTime = widget.time == null ? DateTime.now() : widget.time;
@@ -242,7 +217,6 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
     apController = ScrollController(
         initialScrollOffset: (currentSelectedAPIndex - 1) * _getItemHeight()!);
 
-    // super.didChangeDependencies();
     super.initState();
 
     if (widget.onTimeChange != null) {
@@ -251,15 +225,35 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
     }
   }
 
+  void getCurrentSelectedTime() {
+    currentTime = widget.time == null ? DateTime.now() : widget.time;
+
+    currentSelectedHourIndex =
+        (currentTime!.hour % (widget.is24HourMode ? 24 : 12)) + _getHourCount();
+    hourController.position
+        .correctPixels((currentSelectedHourIndex - 1) * _getItemHeight()!);
+    hourController.position.notifyListeners();
+
+    currentSelectedMinuteIndex =
+        (currentTime!.minute / widget.minutesInterval).floor() +
+            (isLoop(_getMinuteCount()) ? _getMinuteCount() : 1);
+    minuteController.position
+        .correctPixels((currentSelectedMinuteIndex - 1) * _getItemHeight()!);
+    minuteController.position.notifyListeners();
+
+    currentSelectedSecondIndex =
+        (currentTime!.second / widget.secondsInterval).floor() +
+            (isLoop(_getSecondCount()) ? _getSecondCount() : 1);
+    secondController.position
+        .correctPixels((currentSelectedSecondIndex - 1) * _getItemHeight()!);
+    secondController.position.notifyListeners();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.time != currentTime) {
       getCurrentSelectedTime();
     }
-
-    // print('widget.time ${widget.time}');
-    // print('currentTime ${currentTime}');
-
     // print(minuteController.offset);
     List<Widget> contents = [
       SizedBox(
@@ -271,6 +265,7 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
           currentSelectedHourIndex,
           isHourScrolling,
           1,
+          widget.isEnable,
           (index) {
             currentSelectedHourIndex = index;
             isHourScrolling = true;
@@ -288,6 +283,7 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
           currentSelectedMinuteIndex,
           isMinuteScrolling,
           widget.minutesInterval,
+          widget.isEnable,
           (index) {
             currentSelectedMinuteIndex = index;
             isMinuteScrolling = true;
@@ -308,6 +304,7 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
           currentSelectedSecondIndex,
           isSecondsScrolling,
           widget.secondsInterval,
+          widget.isEnable,
           (index) {
             currentSelectedSecondIndex = index;
             isSecondsScrolling = true;
@@ -322,14 +319,20 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
       contents.add(SizedBox(
         width: _getItemWidth()! * 1.2,
         height: _getItemHeight()! * 3,
-        child: apSpinner(),
+        child: apSpinner(widget.isEnable),
       ));
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: contents,
+    return Container(
+      foregroundDecoration: BoxDecoration(
+          color: widget.isEnable
+              ? Colors.white.withOpacity(0.0)
+              : Colors.white.withOpacity(0.4)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: contents,
+      ),
     );
   }
 
@@ -346,6 +349,7 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
       int selectedIndex,
       bool isScrolling,
       int interval,
+      bool isEnable,
       SelectedIndexCallback onUpdateSelectedIndex,
       VoidCallback onScrollEnd) {
     /// wrapping the spinner with stack and add container above it when it's scrolling
@@ -354,107 +358,72 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
     /// maybe later we can find out why this error is happening
 
     Widget _spinner = NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          if (scrollNotification is UserScrollNotification) {
-            if (scrollNotification.direction.toString() ==
-                "ScrollDirection.idle") {
-              if (isLoop(max)) {
-                int segment = (selectedIndex / max).floor();
-                if (segment == 0) {
-                  onUpdateSelectedIndex(selectedIndex + max);
-                  controller
-                      .jumpTo(controller.offset + (max * _getItemHeight()!));
-                } else if (segment == 2) {
-                  onUpdateSelectedIndex(selectedIndex - max);
-                  controller
-                      .jumpTo(controller.offset - (max * _getItemHeight()!));
-                }
+      onNotification: (scrollNotification) {
+        if (scrollNotification is UserScrollNotification) {
+          if (scrollNotification.direction.toString() ==
+              "ScrollDirection.idle") {
+            if (isLoop(max)) {
+              int segment = (selectedIndex / max).floor();
+              if (segment == 0) {
+                onUpdateSelectedIndex(selectedIndex + max);
+                controller
+                    .jumpTo(controller.offset + (max * _getItemHeight()!));
+              } else if (segment == 2) {
+                onUpdateSelectedIndex(selectedIndex - max);
+                controller
+                    .jumpTo(controller.offset - (max * _getItemHeight()!));
               }
-              setState(() {
-                onScrollEnd();
-                if (widget.onTimeChange != null) {
-                  widget.onTimeChange!(getDateTime());
-                }
-              });
             }
-          } else if (scrollNotification is ScrollUpdateNotification) {
             setState(() {
-              onUpdateSelectedIndex(
-                  (controller.offset / _getItemHeight()!).round() + 1);
+              onScrollEnd();
+              if (widget.onTimeChange != null) {
+                widget.onTimeChange!(getDateTime());
+              }
             });
           }
-          return true;
+        } else if (scrollNotification is ScrollUpdateNotification) {
+          setState(() {
+            onUpdateSelectedIndex(
+                (controller.offset / _getItemHeight()!).round() + 1);
+          });
+        }
+        return true;
+      },
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          String text = '';
+          if (isLoop(max)) {
+            text = ((index % max) * interval).toString();
+          } else if (index != 0 && index != max + 1) {
+            text = (((index - 1) % max) * interval).toString();
+          }
+          if (!widget.is24HourMode &&
+              controller == hourController &&
+              text == '0') {
+            text = '12';
+          }
+          if (widget.isForce2Digits && text != '') {
+            text = text.padLeft(2, '0');
+          }
+          return Container(
+            height: _getItemHeight(),
+            alignment: _getAlignment(),
+            child: Text(
+              text,
+              style: selectedIndex == index
+                  ? _getHighlightedTextStyle()
+                  : _getNormalTextStyle(),
+            ),
+          );
         },
-        child: ListWheelScrollView.useDelegate(
-          itemExtent: 42,
-          // diameterRatio: 1,
-          controller: controller,
-
-          physics: ItemScrollPhysics(itemHeight: _getItemHeight()),
-          // padding: EdgeInsets.zero,
-          childDelegate: ListWheelChildBuilderDelegate(
-            childCount: isLoop(max) ? max * 3 : max + 2,
-            builder: (context, index) {
-              String text = '';
-              if (isLoop(max)) {
-                text = ((index % max) * interval).toString();
-              } else if (index != 0 && index != max + 1) {
-                text = (((index - 1) % max) * interval).toString();
-              }
-              if (!widget.is24HourMode &&
-                  controller == hourController &&
-                  text == '0') {
-                text = '12';
-              }
-              if (widget.isForce2Digits && text != '') {
-                text = text.padLeft(2, '0');
-              }
-              return Container(
-                height: _getItemHeight(),
-                alignment: _getAlignment(),
-                child: Text(
-                  text,
-                  style: selectedIndex == index
-                      ? _getHighlightedTextStyle()
-                      : _getNormalTextStyle(),
-                ),
-              );
-            },
-          ),
-        )
-        //  ListView.builder(
-        // itemBuilder: (context, index) {
-        //   String text = '';
-        //   if (isLoop(max)) {
-        //     text = ((index % max) * interval).toString();
-        //   } else if (index != 0 && index != max + 1) {
-        //     text = (((index - 1) % max) * interval).toString();
-        //   }
-        //   if (!widget.is24HourMode &&
-        //       controller == hourController &&
-        //       text == '0') {
-        //     text = '12';
-        //   }
-        //   if (widget.isForce2Digits && text != '') {
-        //     text = text.padLeft(2, '0');
-        //   }
-        //   return Container(
-        //     height: _getItemHeight(),
-        //     alignment: _getAlignment(),
-        //     child: Text(
-        //       text,
-        //       style: selectedIndex == index
-        //           ? _getHighlightedTextStyle()
-        //           : _getNormalTextStyle(),
-        //     ),
-        //   );
-        // },
-        // controller: controller,
-        // itemCount: isLoop(max) ? max * 3 : max + 2,
-        // physics: ItemScrollPhysics(itemHeight: _getItemHeight()),
-        // padding: EdgeInsets.zero,
-        // ),
-        );
+        controller: controller,
+        itemCount: isLoop(max) ? max * 3 : max + 2,
+        physics: isEnable
+            ? ItemScrollPhysics(itemHeight: _getItemHeight())
+            : const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+      ),
+    );
 
     return Stack(
       children: <Widget>[
@@ -469,74 +438,50 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
     );
   }
 
-  Widget apSpinner() {
+  Widget apSpinner(bool isEnable) {
     Widget _spinner = NotificationListener<ScrollNotification>(
-        onNotification: (scrollNotification) {
-          if (scrollNotification is UserScrollNotification) {
-            if (scrollNotification.direction.toString() ==
-                "ScrollDirection.idle") {
-              isAPScrolling = false;
-              if (widget.onTimeChange != null) {
-                widget.onTimeChange!(getDateTime());
-              }
+      onNotification: (scrollNotification) {
+        if (scrollNotification is UserScrollNotification) {
+          if (scrollNotification.direction.toString() ==
+              "ScrollDirection.idle") {
+            isAPScrolling = false;
+            if (widget.onTimeChange != null) {
+              widget.onTimeChange!(getDateTime());
             }
-          } else if (scrollNotification is ScrollUpdateNotification) {
-            setState(() {
-              currentSelectedAPIndex =
-                  (apController.offset / _getItemHeight()!).round() + 1;
-              isAPScrolling = true;
-            });
           }
-          return true;
+        } else if (scrollNotification is ScrollUpdateNotification) {
+          setState(() {
+            currentSelectedAPIndex =
+                (apController.offset / _getItemHeight()!).round() + 1;
+            isAPScrolling = true;
+          });
+        }
+        return true;
+      },
+      child: ListView.builder(
+        itemBuilder: (context, index) {
+          String text = index == 1 ? 'AM' : (index == 2 ? 'PM' : '');
+          return Container(
+            height: _getItemHeight(),
+            alignment: Alignment.center,
+            child: Text(
+              text,
+              style: currentSelectedAPIndex == index
+                  ? _getHighlightedTextStyle()
+                  : _getNormalTextStyle(),
+            ),
+          );
         },
-        child: ListWheelScrollView.useDelegate(
-          itemExtent: 10,
-          diameterRatio: 1,
-          controller: apController,
-          physics: ItemScrollPhysics(
-            itemHeight: _getItemHeight(),
-            targetPixelsLimit: 1,
-          ),
-          childDelegate: ListWheelChildBuilderDelegate(
-            childCount: 4,
-            builder: (context, index) {
-              String text = index == 1 ? 'AM' : (index == 2 ? 'PM' : '');
-              return Container(
-                height: _getItemHeight(),
-                alignment: Alignment.center,
-                child: Text(
-                  text,
-                  style: currentSelectedAPIndex == index
-                      ? _getHighlightedTextStyle()
-                      : _getNormalTextStyle(),
-                ),
-              );
-            },
-          ),
-        )
-        //  ListView.builder(
-
-        //   itemBuilder: (context, index) {
-        //     String text = index == 1 ? 'AM' : (index == 2 ? 'PM' : '');
-        //     return Container(
-        //       height: _getItemHeight(),
-        //       alignment: Alignment.center,
-        //       child: Text(
-        //         text,
-        //         style: currentSelectedAPIndex == index
-        //             ? _getHighlightedTextStyle()
-        //             : _getNormalTextStyle(),
-        //       ),
-        //     );
-        //   },
-        //   controller: apController,
-        //   itemCount: 4,
-        // physics: ItemScrollPhysics(
-        //   itemHeight: _getItemHeight(),
-        //   targetPixelsLimit: 1,
-        // ),
-        // ),
-        );
+        controller: apController,
+        itemCount: 4,
+        physics: isEnable
+            ? ItemScrollPhysics(
+                itemHeight: _getItemHeight(),
+                targetPixelsLimit: 1,
+              )
+            : const NeverScrollableScrollPhysics(),
+      ),
+    );
 
     return Stack(
       children: <Widget>[
@@ -546,100 +491,3 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
     );
   }
 }
-
-
-
-// class TimeSpinner extends StatefulWidget {
-//   final DateTime time;
-//   const TimeSpinner({Key? key, required this.time}) : super(key: key);
-
-//   @override
-//   State<TimeSpinner> createState() => TimeSpinnerState();
-// }
-
-// class TimeSpinnerState extends State<TimeSpinner> {
-//   var _scrollController = InfiniteScrollController(initialScrollOffset: -65);
-
-//   @override
-//   void initState() {
-//     // _scrollController.addListener(_onScrollEvent);
-//     super.initState();
-//   }
-
-//   @override
-//   void dispose() {
-//     // _scrollController.removeListener(_onScrollEvent);
-//     super.dispose();
-//   }
-
-//   void _onScrollEvent() {
-//     // final position = _scrollController.offset;
-//     // print("Position: $position");
-//   }
-
-//   _onEndScroll(ScrollMetrics metrics) {
-//     print(_scrollController.offset);
-
-//     final offset = (_scrollController.offset / 65).round() * 65.0;
-//     _scrollController.animateTo(
-//       offset,
-//       duration: Duration(milliseconds: 500),
-//       curve: Curves.easeInOut,
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     List<Widget> widgetList = [];
-//     for (var i = 0; i < 24; i++) {
-//       widgetList.add(Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 20),
-//         child: Text(
-//           i < 10 ? '0${i}' : '${i}',
-//           style: TextStyle(fontSize: 28),
-//         ),
-//       ));
-//     }
-//     return Container(
-//       color: Colors.amber,
-//       height: 219,
-//       child: Row(
-//         children: [
-//           Expanded(
-//             child: SizedBox(
-//               child: NotificationListener<ScrollNotification>(
-//                 child: InfiniteListView.builder(
-//                   itemBuilder: (context, index) {
-//                     return widgetList[index % widgetList.length];
-//                   },
-//                   controller: _scrollController,
-//                 ),
-//                 onNotification: (notification) {
-//                   if (notification is ScrollEndNotification) {}
-//                   return true;
-//                 },
-//               ),
-//             ),
-//           ),
-//           ElevatedButton(
-//               onPressed: () {
-//                 double containerHeight = 219;
-//                 double textHeight = 28;
-//                 double paddingHeight = 20;
-//                 double height = 73;
-//                 final offset =
-//                     (_scrollController.offset / height).round() * height;
-//                 print(offset);
-//                 _scrollController.animateTo(
-//                   offset,
-//                   duration: Duration(milliseconds: 500),
-//                   curve: Curves.easeInOut,
-//                 );
-                
-//               },
-//               child: Text('test'))
-//         ],
-//       ),
-//     );
-//   }
-// }

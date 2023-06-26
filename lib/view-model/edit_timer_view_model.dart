@@ -19,6 +19,11 @@ class EditTimerViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  void onTimerSelect(DateTime time, String title) {
+    _time = time;
+    _title = title;
+  }
+
   void setTitle(String title) {
     _title = title;
     // notifyListeners();
