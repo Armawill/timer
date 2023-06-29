@@ -39,6 +39,9 @@ class LocalStorageService {
     var box = await Hive.openBox<Timer>(_timerBox);
     List<Timer> list = [];
     box.toMap().forEach((key, value) {
+      if (value.isChecked) {
+        value = value.copyWith(isChecked: false);
+      }
       list.add(value);
     });
     // box.close();

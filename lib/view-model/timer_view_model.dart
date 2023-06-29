@@ -26,6 +26,7 @@ class TimerViewModel with ChangeNotifier {
 
   final CountDownController _countDownController = CountDownController();
   CountDownController get controller => _countDownController;
+
   bool get isTimerPaused => _countDownController.isPaused;
   bool get isTimerCanceled => _isTimerCanceled;
   bool _isShow = false;

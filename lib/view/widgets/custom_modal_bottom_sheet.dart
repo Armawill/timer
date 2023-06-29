@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
+
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 
@@ -80,26 +81,24 @@ class _TimerSaveDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Padding(
-        padding:
-            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Column(
-          children: [
-            const _TopIcon(),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const _CnacelButton(),
-                const _PageTitle(),
-                _ApplyButton(onAdd: onSave),
-              ],
-            ),
-            _TimerTitleEditor(context: context, textController: textController),
-            const _TimerPickerSpinner()
-          ],
-        ),
+    return Padding(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Column(
+        children: [
+          const _TopIcon(),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const _CnacelButton(),
+              const _PageTitle(),
+              _ApplyButton(onAdd: onSave),
+            ],
+          ),
+          _TimerTitleEditor(context: context, textController: textController),
+          const _TimerPickerSpinner(),
+        ],
       ),
     );
   }
@@ -112,19 +111,23 @@ class _TimerPickerSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TimePickerSpinner(
-      is24HourMode: true,
-      normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
-      highlightedTextStyle: const TextStyle(fontSize: 24, color: Colors.black),
-      spacing: 50,
-      itemHeight: 80,
-      isShowSeconds: true,
-      time: Provider.of<EditTimerViewModel>(context).time,
-      isForce2Digits: true,
-      onTimeChange: (time) {
-        Provider.of<EditTimerViewModel>(context, listen: false)
-            .onTimeSelect(time);
-      },
+    return GestureDetector(
+      child: TimePickerSpinner(
+        is24HourMode: true,
+        normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
+        highlightedTextStyle:
+            const TextStyle(fontSize: 24, color: Colors.black),
+        spacing: 50,
+        itemHeight: 80,
+        isShowSeconds: true,
+        time: Provider.of<EditTimerViewModel>(context).time,
+        isForce2Digits: true,
+        onTimeChange: (time) {
+          Provider.of<EditTimerViewModel>(context, listen: false)
+              .onTimeSelect(time);
+        },
+      ),
+      onVerticalDragStart: (details) {},
     );
   }
 }

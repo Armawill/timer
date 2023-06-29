@@ -58,7 +58,24 @@ class _DeleteButton extends StatefulWidget {
   State<_DeleteButton> createState() => _DeleteButtonState();
 }
 
-class _DeleteButtonState extends State<_DeleteButton> {
+class _DeleteButtonState extends State<_DeleteButton>
+    with TickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = BottomSheet.createAnimationController(this);
+    controller.duration = const Duration(seconds: 1);
+    controller.reverseDuration = const Duration(seconds: 1);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var isAnyTimerChecked =
@@ -77,6 +94,7 @@ class _DeleteButtonState extends State<_DeleteButton> {
                 context: context,
                 isDismissible: false,
                 enableDrag: false,
+                transitionAnimationController: controller,
                 shape: const RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(15))),
@@ -250,14 +268,16 @@ class _SavedTimersState extends State<_SavedTimers> {
             },
           ),
         ),
-        PageViewDotIndicator(
-          currentItem: Provider.of<TimerViewModel>(context).selectedPage,
-          count: _pages.length,
-          unselectedColor: Colors.grey,
-          selectedColor: Colors.red,
-          duration: const Duration(milliseconds: 200),
-          size: const Size(8, 8),
-        ),
+        _pages.length > 1
+            ? PageViewDotIndicator(
+                currentItem: Provider.of<TimerViewModel>(context).selectedPage,
+                count: _pages.length,
+                unselectedColor: Colors.grey,
+                selectedColor: Colors.red,
+                duration: const Duration(milliseconds: 200),
+                size: const Size(8, 8),
+              )
+            : Container(),
       ],
     );
   }
@@ -293,9 +313,6 @@ class _Page extends StatelessWidget {
               ? count + 1
               : count,
       itemBuilder: (context, index) {
-        if (isLastPage) {
-          if (!isListEmpty && index < count) {}
-        }
         if (isLastPage && index >= items.length) {
           if (!Provider.of<TimerViewModel>(context).isEditMode) {
             return const AddTimerButton();

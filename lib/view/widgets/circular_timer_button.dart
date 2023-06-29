@@ -29,26 +29,9 @@ class _CircularTimerButtonState extends State<CircularTimerButton> {
               _TimerButton(
                 timer: widget.timer,
               ),
-              Positioned(
-                right: -10,
-                top: -15,
-                child: Checkbox(
-                  value: widget.timer.isChecked,
-                  onChanged: (value) {
-                    if (value != null) {
-                      Provider.of<TimerViewModel>(context, listen: false)
-                          .changeCheckState(widget.timer.id, value);
-                    }
-                  },
-                  side: BorderSide(
-                    color: Colors.grey.shade500,
-                    width: 1.5,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  fillColor: MaterialStateProperty.all(Colors.red),
-                ),
+              _CheckBox(
+                id: widget.timer.id,
+                isChecked: widget.timer.isChecked,
               )
             ],
           )
@@ -58,7 +41,43 @@ class _CircularTimerButtonState extends State<CircularTimerButton> {
   }
 }
 
-class _TimerButton extends StatelessWidget {
+class _CheckBox extends StatelessWidget {
+  const _CheckBox({
+    super.key,
+    required this.id,
+    required this.isChecked,
+  });
+
+  final String id;
+  final bool isChecked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: -10,
+      top: -15,
+      child: Checkbox(
+        value: isChecked,
+        onChanged: (value) {
+          if (value != null) {
+            Provider.of<TimerViewModel>(context, listen: false)
+                .changeCheckState(id, value);
+          }
+        },
+        side: BorderSide(
+          color: Colors.grey.shade500,
+          width: 1.5,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        fillColor: MaterialStateProperty.all(Colors.red),
+      ),
+    );
+  }
+}
+
+class _TimerButton extends StatefulWidget {
   const _TimerButton({
     super.key,
     required this.timer,
@@ -66,10 +85,60 @@ class _TimerButton extends StatelessWidget {
   final Timer timer;
 
   @override
+  State<_TimerButton> createState() => _TimerButtonState();
+}
+
+class _TimerButtonState extends State<_TimerButton>
+    with TickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = BottomSheet.createAnimationController(this);
+    controller.duration = const Duration(seconds: 1);
+    controller.reverseDuration = const Duration(seconds: 1);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  void showTimerEditor() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
+      isScrollControlled: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height -
+            MediaQueryData.fromWindow(window).padding.top,
+      ),
+      transitionAnimationController: controller,
+      builder: (context) => CustomModalBottomSheet.timerSaveDialog(
+        onSave: () {
+          var time =
+              Provider.of<EditTimerViewModel>(context, listen: false).time;
+          var title =
+              Provider.of<EditTimerViewModel>(context, listen: false).title;
+          Provider.of<TimerViewModel>(context, listen: false)
+              .onTimerEdited(widget.timer.id, title, time);
+          Provider.of<TimerViewModel>(context, listen: false).turnOffEditMode();
+        },
+      ),
+    ).whenComplete(() {
+      controller = BottomSheet.createAnimationController(this);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     var isSelected =
-        Provider.of<TimerViewModel>(context).currentTimerId == timer.id;
+        Provider.of<TimerViewModel>(context).currentTimerId == widget.timer.id;
     var isEditMode = Provider.of<TimerViewModel>(context).isEditMode;
+
     return SizedBox(
       height: 100,
       width: 100,
@@ -78,39 +147,16 @@ class _TimerButton extends StatelessWidget {
           if (isEditMode) {
             Provider.of<EditTimerViewModel>(context, listen: false)
                 .onTimerSelect(
-              DateTime(0, 0, 0, timer.hours, timer.minutes, timer.seconds),
-              timer.title,
+              DateTime(0, 0, 0, widget.timer.hours, widget.timer.minutes,
+                  widget.timer.seconds),
+              widget.timer.title,
             );
-            showModalBottomSheet(
-              context: context,
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(15))),
-              isScrollControlled: true,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height -
-                    MediaQueryData.fromWindow(window).padding.top,
-              ),
-              builder: (context) => CustomModalBottomSheet.timerSaveDialog(
-                onSave: () {
-                  var time =
-                      Provider.of<EditTimerViewModel>(context, listen: false)
-                          .time;
-                  var title =
-                      Provider.of<EditTimerViewModel>(context, listen: false)
-                          .title;
-                  Provider.of<TimerViewModel>(context, listen: false)
-                      .onTimerEdited(timer.id, title, time);
-                  Provider.of<TimerViewModel>(context, listen: false)
-                      .turnOffEditMode();
-                },
-              ),
-            );
+            showTimerEditor();
           } else {
-            var selectedTime =
-                DateTime(0, 0, 0, timer.hours, timer.minutes, timer.seconds);
-            Provider.of<TimerViewModel>(context, listen: false)
-                .onTimerSelected(selectedTime, timer.id, timer.title);
+            var selectedTime = DateTime(0, 0, 0, widget.timer.hours,
+                widget.timer.minutes, widget.timer.seconds);
+            Provider.of<TimerViewModel>(context, listen: false).onTimerSelected(
+                selectedTime, widget.timer.id, widget.timer.title);
           }
         },
         style: ElevatedButton.styleFrom(
@@ -125,17 +171,19 @@ class _TimerButton extends StatelessWidget {
         onLongPress: () {
           if (!isEditMode) {
             Provider.of<TimerViewModel>(context, listen: false)
-                .turnOnEditMode(timer.id);
+                .turnOnEditMode(widget.timer.id);
           }
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              timer.title,
+              widget.timer.title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.normal,
               ),
             ),
@@ -145,14 +193,14 @@ class _TimerButton extends StatelessWidget {
                     'Edit',
                     style: TextStyle(
                       color: Colors.red,
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.normal,
                     ),
                   )
                 : _Time(
-                    hours: timer.hours,
-                    minutes: timer.minutes,
-                    seconds: timer.seconds,
+                    hours: widget.timer.hours,
+                    minutes: widget.timer.minutes,
+                    seconds: widget.timer.seconds,
                   ),
           ],
         ),
@@ -189,7 +237,7 @@ class _Time extends StatelessWidget {
     return Text(
       '$h:$m:$s',
       style: const TextStyle(
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: FontWeight.normal,
       ),
     );
