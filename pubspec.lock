@@ -377,7 +377,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "03859c47ab4dec0ede2ce9734343158a20ab819b"
+      resolved-ref: "645b3b2728f7316415f51948d9535afb27a6680f"
       url: "https://github.com/Armawill/flutter_time_picker_spinner"
     source: git
     version: "2.0.0"

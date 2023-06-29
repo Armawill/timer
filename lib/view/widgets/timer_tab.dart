@@ -215,10 +215,12 @@ class _TimePickerSpinner extends StatelessWidget {
     return TimePickerSpinner(
       isEnable: isEditMode ? false : true,
       is24HourMode: true,
+      isLabelShow: true,
       normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
       highlightedTextStyle: const TextStyle(fontSize: 24, color: Colors.black),
-      spacing: 50,
+      spacing: 30,
       itemHeight: 80,
+      itemWidth: MediaQuery.of(context).size.width * 0.2,
       isShowSeconds: true,
       time: Provider.of<TimerViewModel>(context).time,
       isForce2Digits: true,

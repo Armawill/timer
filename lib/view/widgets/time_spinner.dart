@@ -80,6 +80,7 @@ class TimePickerSpinner extends StatefulWidget {
   final bool isForce2Digits;
   final TimePickerCallback? onTimeChange;
   final bool isEnable;
+  final bool isLabelShow;
 
   TimePickerSpinner({
     Key? key,
@@ -97,6 +98,7 @@ class TimePickerSpinner extends StatefulWidget {
     this.isForce2Digits = false,
     this.onTimeChange,
     this.isEnable = true,
+    this.isLabelShow = false,
   }) : super(key: key);
 
   @override
@@ -389,39 +391,60 @@ class _TimePickerSpinnerState extends State<TimePickerSpinner> {
         }
         return true;
       },
-      child: ListView.builder(
-        itemBuilder: (context, index) {
-          String text = '';
-          if (isLoop(max)) {
-            text = ((index % max) * interval).toString();
-          } else if (index != 0 && index != max + 1) {
-            text = (((index - 1) % max) * interval).toString();
-          }
-          if (!widget.is24HourMode &&
-              controller == hourController &&
-              text == '0') {
-            text = '12';
-          }
-          if (widget.isForce2Digits && text != '') {
-            text = text.padLeft(2, '0');
-          }
-          return Container(
-            height: _getItemHeight(),
-            alignment: _getAlignment(),
-            child: Text(
-              text,
-              style: selectedIndex == index
-                  ? _getHighlightedTextStyle()
-                  : _getNormalTextStyle(),
+      child: Row(
+        children: [
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                String text = '';
+                if (isLoop(max)) {
+                  text = ((index % max) * interval).toString();
+                } else if (index != 0 && index != max + 1) {
+                  text = (((index - 1) % max) * interval).toString();
+                }
+                if (!widget.is24HourMode &&
+                    controller == hourController &&
+                    text == '0') {
+                  text = '12';
+                }
+                if (widget.isForce2Digits && text != '') {
+                  text = text.padLeft(2, '0');
+                }
+                return Container(
+                  height: _getItemHeight(),
+                  alignment: _getAlignment(),
+                  child: Text(
+                    text,
+                    style: selectedIndex == index
+                        ? _getHighlightedTextStyle()
+                        : _getNormalTextStyle(),
+                  ),
+                );
+              },
+              controller: controller,
+              itemCount: isLoop(max) ? max * 3 : max + 2,
+              physics: isEnable
+                  ? ItemScrollPhysics(itemHeight: _getItemHeight())
+                  : const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
             ),
-          );
-        },
-        controller: controller,
-        itemCount: isLoop(max) ? max * 3 : max + 2,
-        physics: isEnable
-            ? ItemScrollPhysics(itemHeight: _getItemHeight())
-            : const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
+          ),
+          widget.isLabelShow
+              ? Row(
+                  children: [
+                    const SizedBox(width: 5),
+                    Text(
+                      controller == hourController
+                          ? 'hours'
+                          : controller == minuteController
+                              ? 'min'
+                              : 'sec',
+                    ),
+                  ],
+                )
+              : Container(),
+        ],
       ),
     );
 
