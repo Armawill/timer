@@ -18,50 +18,65 @@ class TimerViewModel with ChangeNotifier {
 
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
-  var _isTimerCanceled = false;
-  // var _isTimerCanceled = false;
   var _isEditMode = false;
+
+  /// [_isCheckedAll] is true, if all timers are checked
   var _isCheckedAll = false;
+
+  /// [_isAnyTimerChecked] is true, if any timer is checked
   var _isAnyTimerChecked = false;
+
+  /// It is needed to animate start button and delete button. [_isModeChanged] is true, if if edit mode was called.
   var _isModeChanged = false;
+
   // var _isTimerStateChanged = false;
   String? currentTimerTitle;
   String? currentTimerId;
   DateTime _targetTime = DateTime.now();
   int _newDuration = 0;
+  int _countOfCheckedTimers = 0;
+  int _selectedPage = 0;
 
+  List<Timer> timerList = [
+    // Timer(id: 't1', title: 'Plank', hours: 0, minutes: 0, seconds: 2),
+    // Timer(id: 't2', title: 'Test', hours: 0, minutes: 5, seconds: 0),
+    // Timer(id: 't3', title: 'Other', hours: 0, minutes: 10, seconds: 0),
+    // Timer(id: 't4', title: 'Timer', hours: 1, minutes: 0, seconds: 0),
+    // Timer(id: 't5', title: 'Gym', hours: 0, minutes: 0, seconds: 40),
+    // Timer(id: 't6', title: 'Test 2', hours: 0, minutes: 0, seconds: 10),
+    // Timer(id: 't7', title: 'Test 3', hours: 0, minutes: 15, seconds: 0),
+  ];
+  final PageController _pageController = PageController(initialPage: 0);
   final CountDownController _countDownController = CountDownController();
+
+  int get selectedPage => _selectedPage;
+
+  int get countOfCheckedTimers => _countOfCheckedTimers;
+
+  PageController get pageController => _pageController;
+
   CountDownController get controller => _countDownController;
 
   bool get isTimerStarted => _isTimerStarted;
 
   bool get isTimerPaused => _countDownController.isPaused;
-  bool get isTimerCanceled => _isTimerCanceled;
-  bool _isShow = false;
+
+  bool get isEditMode => _isEditMode;
 
   // bool get isTimerCanceled => _isTimerCanceled;
 
-  bool get isShow => _isShow;
-
-  set isShow(bool value) => _isShow = value;
-
-  bool _isEditMode = false;
-  bool get isEditMode => _isEditMode;
-
-  bool _isCheckedAll = false;
+  /// It is needed to animate start button and delete button. [_isModeChanged] is true, if if edit mode was called.
   bool get isModeChanged => _isModeChanged;
 
+  /// [isCheckedAll] is true, if all timers are checked
   bool get isCheckedAll => _isCheckedAll;
 
-  bool _isAnyTimerChecked = false;
+  /// [isAnyTimerChecked] is true, if any timer is checked
   bool get isAnyTimerChecked => _isAnyTimerChecked;
 
   // bool get isTimerStateChanged => _isTimerStateChanged;
 
   DateTime get time => _time;
-
-  int _countOfCheckedTimers = 0;
-  int get countOfCheckedTimers => _countOfCheckedTimers;
 
   String getTimeString() {
     var timeString =
@@ -83,16 +98,6 @@ class TimerViewModel with ChangeNotifier {
     final secondsStr = '${seconds < 10 ? '0$seconds' : seconds}';
     return '$hoursStr:$minutesStr:$secondsStr';
   }
-
-  List<Timer> timerList = [
-    // Timer(id: 't1', title: 'Plank', hours: 0, minutes: 0, seconds: 2),
-    // Timer(id: 't2', title: 'Test', hours: 0, minutes: 5, seconds: 0),
-    // Timer(id: 't3', title: 'Other', hours: 0, minutes: 10, seconds: 0),
-    // Timer(id: 't4', title: 'Timer', hours: 1, minutes: 0, seconds: 0),
-    // Timer(id: 't5', title: 'Gym', hours: 0, minutes: 0, seconds: 40),
-    // Timer(id: 't6', title: 'Test 2', hours: 0, minutes: 0, seconds: 10),
-    // Timer(id: 't7', title: 'Test 3', hours: 0, minutes: 15, seconds: 0),
-  ];
 
   /// Loads timers from local storage
   void loadTimers() async {
@@ -128,12 +133,6 @@ class TimerViewModel with ChangeNotifier {
     }
     return pages;
   }
-
-  int _selectedPage = 0;
-  int get selectedPage => _selectedPage;
-
-  final PageController _pageController = PageController(initialPage: 0);
-  PageController get pageController => _pageController;
 
   void onPageChanged(int page) {
     _selectedPage = page;

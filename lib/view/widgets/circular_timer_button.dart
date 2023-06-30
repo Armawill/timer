@@ -90,21 +90,21 @@ class _TimerButton extends StatefulWidget {
 
 class _TimerButtonState extends State<_TimerButton>
     with TickerProviderStateMixin {
-  late AnimationController controller;
+  // late AnimationController controller;
 
-  @override
-  void initState() {
-    super.initState();
-    controller = BottomSheet.createAnimationController(this);
-    controller.duration = const Duration(seconds: 1);
-    controller.reverseDuration = const Duration(seconds: 1);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller = BottomSheet.createAnimationController(this);
+  //   controller.duration = const Duration(seconds: 1);
+  //   controller.reverseDuration = const Duration(seconds: 1);
+  // }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   controller.dispose();
+  //   super.dispose();
+  // }
 
   void showTimerEditor() {
     showModalBottomSheet(
@@ -116,7 +116,7 @@ class _TimerButtonState extends State<_TimerButton>
         maxHeight: MediaQuery.of(context).size.height -
             MediaQueryData.fromWindow(window).padding.top,
       ),
-      transitionAnimationController: controller,
+      // transitionAnimationController: controller,
       builder: (context) => CustomModalBottomSheet.timerSaveDialog(
         onSave: () {
           var time =
@@ -128,9 +128,10 @@ class _TimerButtonState extends State<_TimerButton>
           Provider.of<TimerViewModel>(context, listen: false).turnOffEditMode();
         },
       ),
-    ).whenComplete(() {
-      controller = BottomSheet.createAnimationController(this);
-    });
+    );
+    // .whenComplete(() {
+    //   controller = BottomSheet.createAnimationController(this);
+    // });
   }
 
   @override
