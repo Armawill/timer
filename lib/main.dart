@@ -3,9 +3,9 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:timer/model/background_service.dart';
-import 'package:timer/model/local_storage_service.dart';
-import 'package:timer/model/overlay_service.dart';
+import 'package:timer/services/background_service.dart';
+import 'package:timer/services/local_storage_service.dart';
+import 'package:timer/services/overlay_service.dart';
 import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:timer/model/overlay_service.dart';
+import 'package:timer/services/overlay_service.dart';
 
 class OverlayViewModel extends ChangeNotifier {
   void listenOverlay() {

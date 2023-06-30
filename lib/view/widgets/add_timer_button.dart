@@ -15,21 +15,21 @@ class AddTimerButton extends StatefulWidget {
 
 class _AddTimerButtonState extends State<AddTimerButton>
     with TickerProviderStateMixin {
-  late AnimationController controller;
+  // late AnimationController controller;
 
-  @override
-  void initState() {
-    super.initState();
-    controller = BottomSheet.createAnimationController(this);
-    controller.duration = const Duration(seconds: 1);
-    controller.reverseDuration = const Duration(seconds: 1);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller = BottomSheet.createAnimationController(this);
+  //   controller.duration = const Duration(seconds: 1);
+  //   controller.reverseDuration = const Duration(seconds: 1);
+  // }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   controller.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,6 @@ class _AddTimerButtonState extends State<AddTimerButton>
               maxHeight: MediaQuery.of(context).size.height -
                   MediaQueryData.fromWindow(window).padding.top,
             ),
-            transitionAnimationController: controller,
             builder: (context) => CustomModalBottomSheet.timerSaveDialog(
               onSave: () {
                 var time =
@@ -61,9 +60,10 @@ class _AddTimerButtonState extends State<AddTimerButton>
                     .onTimerAdded(title, time);
               },
             ),
-          ).whenComplete(() {
-            controller = BottomSheet.createAnimationController(this);
-          });
+          );
+          // .whenComplete(() {
+          //   controller = BottomSheet.createAnimationController(this);
+          // });
         },
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),

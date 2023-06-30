@@ -64,21 +64,21 @@ class _DeleteButton extends StatefulWidget {
 
 class _DeleteButtonState extends State<_DeleteButton>
     with TickerProviderStateMixin {
-  late AnimationController controller;
+  // late AnimationController controller;
 
-  @override
-  void initState() {
-    super.initState();
-    controller = BottomSheet.createAnimationController(this);
-    controller.duration = const Duration(seconds: 1);
-    controller.reverseDuration = const Duration(seconds: 1);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller = BottomSheet.createAnimationController(this);
+  //   controller.duration = const Duration(seconds: 1);
+  //   controller.reverseDuration = const Duration(seconds: 1);
+  // }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   controller.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,7 @@ class _DeleteButtonState extends State<_DeleteButton>
                 context: context,
                 isDismissible: false,
                 enableDrag: false,
-                transitionAnimationController: controller,
+                // transitionAnimationController: controller,
                 shape: const RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(15))),
