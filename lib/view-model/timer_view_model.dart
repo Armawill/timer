@@ -19,6 +19,12 @@ class TimerViewModel with ChangeNotifier {
   var _time = DateTime(0, 0, 0, 0, 0, 10);
   var _isTimerStarted = false;
   var _isTimerCanceled = false;
+  // var _isTimerCanceled = false;
+  var _isEditMode = false;
+  var _isCheckedAll = false;
+  var _isAnyTimerChecked = false;
+  var _isModeChanged = false;
+  // var _isTimerStateChanged = false;
   String? currentTimerTitle;
   String? currentTimerId;
   DateTime _targetTime = DateTime.now();
@@ -27,9 +33,13 @@ class TimerViewModel with ChangeNotifier {
   final CountDownController _countDownController = CountDownController();
   CountDownController get controller => _countDownController;
 
+  bool get isTimerStarted => _isTimerStarted;
+
   bool get isTimerPaused => _countDownController.isPaused;
   bool get isTimerCanceled => _isTimerCanceled;
   bool _isShow = false;
+
+  // bool get isTimerCanceled => _isTimerCanceled;
 
   bool get isShow => _isShow;
 
@@ -39,10 +49,14 @@ class TimerViewModel with ChangeNotifier {
   bool get isEditMode => _isEditMode;
 
   bool _isCheckedAll = false;
+  bool get isModeChanged => _isModeChanged;
+
   bool get isCheckedAll => _isCheckedAll;
 
   bool _isAnyTimerChecked = false;
   bool get isAnyTimerChecked => _isAnyTimerChecked;
+
+  // bool get isTimerStateChanged => _isTimerStateChanged;
 
   DateTime get time => _time;
 
@@ -139,18 +153,26 @@ class TimerViewModel with ChangeNotifier {
     return timestamp;
   }
 
-  bool get isTimerStarted => _isTimerStarted;
+  void onModeChanged() {
+    if (_isModeChanged) {
+      _isEditMode = !_isEditMode;
+    }
+    _isModeChanged = false;
+    notifyListeners();
+  }
 
   void turnOnEditMode([String? id]) {
     if (id != null) {
       changeCheckState(id, true);
     }
-    _isEditMode = true;
+    // _isEditMode = true;
+    _isModeChanged = true;
     notifyListeners();
   }
 
   void turnOffEditMode() {
-    _isEditMode = false;
+    // _isEditMode = false;
+    _isModeChanged = true;
     _isCheckedAll = false;
     _uncheckAll();
     notifyListeners();
@@ -258,7 +280,8 @@ class TimerViewModel with ChangeNotifier {
       }
       return element.isChecked;
     });
-    _isEditMode = false;
+    // _isEditMode = false;
+    _isModeChanged = true;
     notifyListeners();
   }
 
@@ -276,7 +299,6 @@ class TimerViewModel with ChangeNotifier {
     await prefs.setBool('isShow', false);
     await prefs.setBool('setAsForeground', false);
 
-    _isTimerCanceled = true;
     _countDownController.reset();
     NotificationService.cancelAllNotifications();
     notifyListeners();
@@ -299,8 +321,8 @@ class TimerViewModel with ChangeNotifier {
   }
 
   void onTimerStart() async {
-    _isTimerCanceled = false;
     _isTimerStarted = true;
+    // _isTimerStateChanged = true;
     var targetTime =
         DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
     _targetTime = targetTime;
@@ -320,16 +342,25 @@ class TimerViewModel with ChangeNotifier {
 
   void onTimerCompleted(BuildContext context) async {
     _isTimerStarted = false;
+    // _isTimerStateChanged = true;
     notifyListeners();
   }
 
-  Future<void> showNotification() async {
-    var targetTime =
-        DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
-    NotificationService.showNotification(
-      id: 0,
-      title: 'Timer',
-      body: 'Timer will end at ${DateFormat.Hms().format(targetTime)}',
-    );
-  }
+  // void onTimerStateChanged() {
+  //   if (_isTimerStateChanged) {
+  //     _isTimerStarted = !_isTimerStarted;
+  //   }
+  //   _isTimerStateChanged = false;
+  //   notifyListeners();
+  // }
+
+  // Future<void> showNotification() async {
+  //   var targetTime =
+  //       DateTime.now().add(Duration(milliseconds: getDurationInMilliseconds()));
+  //   NotificationService.showNotification(
+  //     id: 0,
+  //     title: 'Timer',
+  //     body: 'Timer will end at ${DateFormat.Hms().format(targetTime)}',
+  //   );
+  // }
 }

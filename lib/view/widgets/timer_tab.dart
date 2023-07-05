@@ -4,6 +4,7 @@ import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/timer.dart';
 import 'package:timer/presentation/custom_icons_icons.dart';
+import 'package:timer/view/widgets/custom_animated_positioned.dart';
 import 'package:timer/view/widgets/custom_modal_bottom_sheet.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
@@ -42,8 +43,11 @@ class _TimerTabState extends State<TimerTab> {
         isTimerStarted
             ? const _TimerControlButtons()
             : isEditMode
-                ? const _DeleteButton()
-                : const _StartButton(),
+                ? const CustomAnimatedPositionedFromBottom(
+                    child: _DeleteButton())
+                : const CustomAnimatedPositionedFromBottom(
+                    child: _StartButton(),
+                  ),
       ],
     );
   }
@@ -142,62 +146,70 @@ class _TimerControlButtons extends StatelessWidget {
     return Container(
       alignment: Alignment.bottomCenter,
       padding: EdgeInsets.only(bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      width: MediaQuery.of(context).size.width,
+      child: Wrap(
         children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.4,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                Provider.of<TimerViewModel>(context, listen: false)
-                    .onTimerCancel();
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(fontSize: 18),
-              ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red.shade100),
-                foregroundColor: MaterialStateProperty.all(Colors.red),
-              ),
-            ),
-          ),
-          Provider.of<TimerViewModel>(context).isTimerPaused
-              ? SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Provider.of<TimerViewModel>(context, listen: false)
-                          .onTimerResume();
-                    },
-                    child: const Text(
-                      'Resume',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red),
-                    ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Provider.of<TimerViewModel>(context, listen: false)
+                        .onTimerCancel();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.red.shade100),
+                    foregroundColor: MaterialStateProperty.all(Colors.red),
                   ),
-                )
-              : SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Provider.of<TimerViewModel>(context, listen: false)
-                          .onTimerPause();
-                    },
-                    child: Text(
-                      'Pause',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.red),
-                    ),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
+              ),
+              Provider.of<TimerViewModel>(context).isTimerPaused
+                  ? SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Provider.of<TimerViewModel>(context, listen: false)
+                              .onTimerResume();
+                        },
+                        child: const Text(
+                          'Resume',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red),
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Provider.of<TimerViewModel>(context, listen: false)
+                              .onTimerPause();
+                        },
+                        child: Text(
+                          'Pause',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red),
+                        ),
+                      ),
+                    ),
+            ],
+          ),
         ],
       ),
     );
@@ -297,6 +309,7 @@ class _Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isEditMode = Provider.of<TimerViewModel>(context).isEditMode;
     bool isListEmpty = false;
     if (count == 0) {
       isListEmpty = true;
@@ -316,9 +329,11 @@ class _Page extends StatelessWidget {
               : count,
       itemBuilder: (context, index) {
         if (isLastPage && index >= items.length) {
-          if (!Provider.of<TimerViewModel>(context).isEditMode) {
-            return const AddTimerButton();
-          }
+          return AnimatedOpacity(
+            opacity: isEditMode ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            child: const AddTimerButton(),
+          );
         } else {
           return CircularTimerButton(
             timer: items[index],
@@ -343,6 +358,8 @@ class _StartButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () async {
             Provider.of<TimerViewModel>(context, listen: false).onTimerStart();
+            // Provider.of<TimerViewModel>(context, listen: false)
+            //     .onTimerStateChanged();
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(Colors.red),
