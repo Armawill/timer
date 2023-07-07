@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:timer/view-model/timer_view_model.dart';
+import 'package:timer/view/screens/settings_screen.dart';
 
 class TopMenu extends StatefulWidget {
   const TopMenu({
@@ -64,13 +66,45 @@ class _TopMenuState extends State<TopMenu> {
                   ),
                 ),
               ),
-              IconButton(
-                onPressed: () {},
+              PopupMenuButton(
+                initialValue: 0,
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      child: const Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black,
+                        ),
+                      ),
+                      onTap: () async {
+                        await Future.delayed(Duration.zero);
+                        Navigator.of(context)
+                            .pushNamed(SettingsScreen.routeName);
+                      },
+                    ),
+                  ];
+                },
                 icon: const Icon(
                   Icons.more_vert,
                   color: Colors.black,
                 ),
+                offset: const Offset(-10, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                shadowColor: Colors.grey.shade100,
               )
+              // IconButton(
+              //   onPressed: () {
+
+              //   },
+              // icon: const Icon(
+              //   Icons.more_vert,
+              //   color: Colors.black,
+              // ),
+              // )
             ],
           );
   }

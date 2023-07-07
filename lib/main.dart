@@ -6,13 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer/services/background_service.dart';
 import 'package:timer/services/local_storage_service.dart';
 import 'package:timer/services/overlay_service.dart';
+import 'package:timer/utils/app_theme.dart';
 import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
+import 'package:timer/view/screens/settings_screen.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
-import 'view/widgets/custom_tab_bar.dart';
-import 'view/widgets/timer_tab.dart';
-import 'view/widgets/top_menu.dart';
+import 'package:timer/view/screens/home_screen.dart';
 
 final service = FlutterBackgroundService();
 
@@ -25,7 +25,7 @@ void main() async {
   prefs.clear();
   await OverlayService.initialize();
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 // getOverlayPermission() async {
@@ -39,7 +39,7 @@ void overlayMain() async {
   await BackgroundService.initilizeService();
   runApp(
     MaterialApp(
-      // debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
       home: OverlayWidget(),
     ),
   );
@@ -60,76 +60,17 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        // debugShowCheckedModeBanner: false,
         home: ScrollConfiguration(
           behavior: CustomScrollBehavior(),
           child: HomeScreen(),
         ),
-        theme: ThemeData(
-          elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ButtonStyle(
-                  textStyle: MaterialStateProperty.all<TextStyle>(
-                    const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ))),
-        ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-
-    // NotificationService.initialize();
-    // listenNotifications();
-
-    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle())
-  }
-
-  // void listenNotifications() =>
-  //     NotificationService.onNotifications.stream.listen((payload) {});
-
-  @override
-  Widget build(BuildContext context) {
-    var isEditMode = Provider.of<TimerViewModel>(context).isEditMode;
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 2,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        key: Provider.of<TimerViewModel>(context).scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: Colors.grey.shade50,
-          title: const TopMenu(),
-          bottom: const CustomTabBar(),
-          elevation: 0,
-        ),
-        body: TabBarView(
-          physics:
-              isEditMode ? NeverScrollableScrollPhysics() : PageScrollPhysics(),
-          children: const [
-            TimerTab(),
-            Center(
-              child: Text('Work in progress'),
-            ),
-          ],
-        ),
+        theme: AppTheme.getThemeData(),
+        onGenerateRoute: (settings) {
+          if (settings.name == SettingsScreen.routeName) {
+            return AppTheme.buildRoute(const SettingsScreen(), settings);
+          }
+        },
       ),
     );
   }
