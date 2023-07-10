@@ -6,7 +6,7 @@ import 'package:timer/view/widgets/timer_tab.dart';
 import 'package:timer/view/widgets/top_menu.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: TabBarView(
           physics:
-              isEditMode ? NeverScrollableScrollPhysics() : PageScrollPhysics(),
+              isEditMode ? const NeverScrollableScrollPhysics() : const PageScrollPhysics(),
           children: const [
             TimerTab(),
             Center(

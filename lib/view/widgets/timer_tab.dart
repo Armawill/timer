@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:provider/provider.dart';
-import 'package:timer/model/timer.dart';
+import 'package:timer/model/timer/timer.dart';
 import 'package:timer/presentation/custom_icons_icons.dart';
 import 'package:timer/view/widgets/custom_animated_positioned.dart';
 import 'package:timer/view/widgets/custom_modal_bottom_sheet.dart';
@@ -32,10 +32,10 @@ class _TimerTabState extends State<TimerTab> {
           child: Column(
             children: [
               Provider.of<TimerViewModel>(context).isTimerStarted
-                  ? CircularTimer()
+                  ? const CircularTimer()
                   : const _TimePickerSpinner(),
               !Provider.of<TimerViewModel>(context).isTimerStarted
-                  ? _SavedTimers()
+                  ? const _SavedTimers()
                   : Container(),
             ],
           ),
@@ -54,9 +54,7 @@ class _TimerTabState extends State<TimerTab> {
 }
 
 class _DeleteButton extends StatefulWidget {
-  const _DeleteButton({
-    super.key,
-  });
+  const _DeleteButton();
 
   @override
   State<_DeleteButton> createState() => _DeleteButtonState();
@@ -145,7 +143,7 @@ class _TimerControlButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.bottomCenter,
-      padding: EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: 10),
       width: MediaQuery.of(context).size.width,
       child: Wrap(
         children: [
@@ -165,7 +163,7 @@ class _TimerControlButtons extends StatelessWidget {
                         MaterialStateProperty.all(Colors.red.shade100),
                     foregroundColor: MaterialStateProperty.all(Colors.red),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Cancel',
                     style: TextStyle(fontSize: 18),
                   ),
@@ -180,13 +178,13 @@ class _TimerControlButtons extends StatelessWidget {
                           Provider.of<TimerViewModel>(context, listen: false)
                               .onTimerResume();
                         },
-                        child: const Text(
-                          'Resume',
-                          style: TextStyle(fontSize: 18),
-                        ),
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.red),
+                        ),
+                        child: const Text(
+                          'Resume',
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
                     )
@@ -198,13 +196,13 @@ class _TimerControlButtons extends StatelessWidget {
                           Provider.of<TimerViewModel>(context, listen: false)
                               .onTimerPause();
                         },
-                        child: Text(
-                          'Pause',
-                          style: TextStyle(fontSize: 18),
-                        ),
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.red),
+                        ),
+                        child: const Text(
+                          'Pause',
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
                     ),
@@ -245,7 +243,7 @@ class _TimePickerSpinner extends StatelessWidget {
 }
 
 class _SavedTimers extends StatefulWidget {
-  const _SavedTimers({super.key});
+  const _SavedTimers();
 
   @override
   State<_SavedTimers> createState() => _SavedTimersState();
@@ -254,7 +252,7 @@ class _SavedTimers extends StatefulWidget {
 class _SavedTimersState extends State<_SavedTimers> {
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages =
+    final List<Widget> pages =
         Provider.of<TimerViewModel>(context).getPages().map((page) {
       return _Page(
         count: page.length,
@@ -267,25 +265,25 @@ class _SavedTimersState extends State<_SavedTimers> {
 
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.33,
           child: PageView(
-            physics: (isEditMode && _pages.length == 1)
+            physics: (isEditMode && pages.length == 1)
                 ? const NeverScrollableScrollPhysics()
                 : null,
             controller: Provider.of<TimerViewModel>(context).pageController,
-            children: _pages,
+            children: pages,
             onPageChanged: (page) {
               Provider.of<TimerViewModel>(context, listen: false)
                   .onPageChanged(page);
             },
           ),
         ),
-        _pages.length > 1
+        pages.length > 1
             ? PageViewDotIndicator(
                 currentItem: Provider.of<TimerViewModel>(context).selectedPage,
-                count: _pages.length,
+                count: pages.length,
                 unselectedColor: Colors.grey,
                 selectedColor: Colors.red,
                 duration: const Duration(milliseconds: 200),
@@ -302,8 +300,7 @@ class _Page extends StatelessWidget {
   final List<Timer> items;
   final bool isLastPage;
   const _Page(
-      {super.key,
-      required this.count,
+      {required this.count,
       required this.items,
       required this.isLastPage});
 
@@ -345,7 +342,7 @@ class _Page extends StatelessWidget {
 }
 
 class _StartButton extends StatelessWidget {
-  const _StartButton({super.key});
+  const _StartButton();
 
   @override
   Widget build(BuildContext context) {

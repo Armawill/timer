@@ -22,7 +22,7 @@ class _OverlayWidgetState extends State<OverlayWidget> {
       child: Container(
         padding: EdgeInsets.only(
           top: 46 +
-              MediaQueryData.fromWindow(WidgetsBinding.instance.window)
+              MediaQueryData.fromView(WidgetsBinding.instance.window)
                   .padding
                   .top,
         ),
@@ -57,9 +57,7 @@ class _OverlayWidgetState extends State<OverlayWidget> {
 }
 
 class _StopButton extends StatelessWidget {
-  const _StopButton({
-    super.key,
-  });
+  const _StopButton();
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +77,7 @@ class _StopButton extends StatelessWidget {
 }
 
 class _AppInfo extends StatelessWidget {
-  const _AppInfo({
-    super.key,
-  });
+  const _AppInfo();
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +99,7 @@ class _AppInfo extends StatelessWidget {
 }
 
 class _TimerInfo extends StatefulWidget {
-  const _TimerInfo({
-    super.key,
-  });
+  const _TimerInfo();
 
   @override
   State<_TimerInfo> createState() => _TimerInfoState();
@@ -124,6 +118,7 @@ class _TimerInfoState extends State<_TimerInfo> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return RichText(
         text: TextSpan(

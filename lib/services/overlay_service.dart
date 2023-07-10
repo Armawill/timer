@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:timer/services/local_storage_service.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 
 class OverlayService {
   static final AudioPlayer audioPlayer = AudioPlayer();
@@ -13,8 +16,19 @@ class OverlayService {
   }
 
   static Future<void> play() async {
+    var sound = await LocalStorageService.getOverlaySound();
+
     await audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await audioPlayer.play(AssetSource('audio/musical_alert_notification.wav'));
+    print('sound $sound');
+    if (sound.isFromAsset) {
+      await audioPlayer.play(AssetSource(sound.assetPath!));
+    } else if (sound.isFromUri) {
+      File file = await toFile(sound.uri!);
+      await audioPlayer.play(DeviceFileSource(file.path));
+    } else {
+      await audioPlayer
+          .play(AssetSource('audio/musical_alert_notification.wav'));
+    }
   }
 
   static Future<void> stop() async {

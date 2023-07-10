@@ -46,7 +46,7 @@ class _AddTimerButtonState extends State<AddTimerButton>
             isScrollControlled: true,
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height -
-                  MediaQueryData.fromWindow(window).padding.top,
+                  MediaQueryData.fromView(window).padding.top,
             ),
             builder: (context) => CustomModalBottomSheet.timerSaveDialog(
               onSave: () {

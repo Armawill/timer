@@ -6,7 +6,7 @@ import 'package:timer/services/notification_service.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:timer/services/overlay_service.dart';
-import 'package:timer/model/timer.dart';
+import 'package:timer/model/timer/timer.dart';
 
 class TimerViewModel with ChangeNotifier {
   TimerViewModel() {
@@ -101,7 +101,7 @@ class TimerViewModel with ChangeNotifier {
 
   /// Loads timers from local storage
   void loadTimers() async {
-    timerList = await LocalStorageService.load();
+    timerList = await LocalStorageService.loadTimers();
     notifyListeners();
   }
 
@@ -251,7 +251,7 @@ class TimerViewModel with ChangeNotifier {
     timerList.add(
       timer,
     );
-    LocalStorageService.save(timer);
+    LocalStorageService.saveTimer(timer);
     currentTimerId = id;
     currentTimerTitle = title;
     onTimerSelected(time);
@@ -268,14 +268,14 @@ class TimerViewModel with ChangeNotifier {
         );
     timerList.replaceRange(index, index + 1, [timer]);
     _time = time;
-    LocalStorageService.save(timer);
+    LocalStorageService.saveTimer(timer);
     notifyListeners();
   }
 
   void onTimerDeleted() {
     timerList.removeWhere((element) {
       if (element.isChecked) {
-        LocalStorageService.delete(element.id);
+        LocalStorageService.deleteTimer(element.id);
       }
       return element.isChecked;
     });

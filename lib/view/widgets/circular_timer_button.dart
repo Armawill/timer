@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:timer/model/timer.dart';
+import 'package:timer/model/timer/timer.dart';
 import 'package:timer/view/widgets/custom_modal_bottom_sheet.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
@@ -43,7 +43,6 @@ class _CircularTimerButtonState extends State<CircularTimerButton> {
 
 class _CheckBox extends StatelessWidget {
   const _CheckBox({
-    super.key,
     required this.id,
     required this.isChecked,
   });
@@ -79,7 +78,6 @@ class _CheckBox extends StatelessWidget {
 
 class _TimerButton extends StatefulWidget {
   const _TimerButton({
-    super.key,
     required this.timer,
   });
   final Timer timer;
@@ -114,7 +112,7 @@ class _TimerButtonState extends State<_TimerButton>
       isScrollControlled: true,
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height -
-            MediaQueryData.fromWindow(window).padding.top,
+            MediaQueryData.fromView(window).padding.top,
       ),
       // transitionAnimationController: controller,
       builder: (context) => CustomModalBottomSheet.timerSaveDialog(
@@ -215,7 +213,6 @@ class _Time extends StatelessWidget {
   final int minutes;
   final int seconds;
   const _Time({
-    super.key,
     required this.hours,
     required this.minutes,
     required this.seconds,

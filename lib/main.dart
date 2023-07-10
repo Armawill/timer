@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:timer/services/background_service.dart';
 import 'package:timer/services/local_storage_service.dart';
@@ -9,8 +8,10 @@ import 'package:timer/services/overlay_service.dart';
 import 'package:timer/utils/app_theme.dart';
 import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
+import 'package:timer/view-model/sound_change_screen_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 import 'package:timer/view/screens/settings_screen.dart';
+import 'package:timer/view/screens/sound_change_screen.dart';
 import 'package:timer/view/widgets/overlay_widget.dart';
 import 'package:timer/view/screens/home_screen.dart';
 
@@ -21,11 +22,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageService.initialize();
   // await NotificationService.initialize();
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.clear();
   await OverlayService.initialize();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 // getOverlayPermission() async {
@@ -38,7 +37,7 @@ void overlayMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   await BackgroundService.initilizeService();
   runApp(
-    MaterialApp(
+    const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: OverlayWidget(),
     ),
@@ -58,6 +57,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => EditTimerViewModel(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => SoundChangeScreenViewModel(),
+        ),
       ],
       child: MaterialApp(
         // debugShowCheckedModeBanner: false,
@@ -69,6 +71,9 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           if (settings.name == SettingsScreen.routeName) {
             return AppTheme.buildRoute(const SettingsScreen(), settings);
+          }
+          if (settings.name == SoundChangeScreen.routeName) {
+            return AppTheme.buildRoute(const SoundChangeScreen(), settings);
           }
         },
       ),

@@ -17,6 +17,7 @@ class OverlayViewModel extends ChangeNotifier {
     });
   }
 
+  @override
   void dispose() {
     FlutterOverlayWindow.disposeOverlayListener();
   }

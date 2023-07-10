@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 
 class CircularTimer extends StatefulWidget {
-  CircularTimer({super.key});
+  const CircularTimer({super.key});
 
   @override
   State<CircularTimer> createState() => _CircularTimerState();
@@ -60,7 +60,7 @@ class _CircularTimerState extends State<CircularTimer> {
             alignment: Alignment.center,
             child: Text(
               Provider.of<TimerViewModel>(context).currentTimerTitle ?? '',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 color: Colors.grey,
               ),
