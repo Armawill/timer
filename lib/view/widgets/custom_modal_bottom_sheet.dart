@@ -10,9 +10,7 @@ import 'package:timer/view-model/timer_view_model.dart';
 class CustomModalBottomSheet extends StatefulWidget {
   late final VoidCallback? onSave;
   CustomModalBottomSheet.timerSaveDialog({super.key, required this.onSave});
-  CustomModalBottomSheet.timerDeleteDialog({super.key}) {
-    onSave = null;
-  }
+  CustomModalBottomSheet.timerDeleteDialog({super.key}) : onSave = null;
 
   @override
   State<CustomModalBottomSheet> createState() => _CustomModalBottomSheetState();
@@ -23,10 +21,10 @@ class _CustomModalBottomSheetState extends State<CustomModalBottomSheet> {
   Widget build(BuildContext context) {
     if (widget.onSave != null) {
       TextEditingController textController = TextEditingController();
-      textController.text = Provider.of<EditTimerViewModel>(context).title;
+      textController.text =
+          Provider.of<EditTimerViewModel>(context, listen: false).title;
       textController.selection = TextSelection.fromPosition(
           TextPosition(offset: textController.text.length));
-
       return _TimerSaveDialog(
           onSave: widget.onSave!, textController: textController);
     } else {
@@ -111,23 +109,23 @@ class _TimerPickerSpinner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: TimePickerSpinner(
-        is24HourMode: true,
-        normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
-        highlightedTextStyle:
-            const TextStyle(fontSize: 24, color: Colors.black),
-        spacing: 50,
-        itemHeight: 80,
-        isShowSeconds: true,
-        time: Provider.of<EditTimerViewModel>(context).time,
-        isForce2Digits: true,
-        onTimeChange: (time) {
-          Provider.of<EditTimerViewModel>(context, listen: false)
-              .onTimeSelect(time);
-        },
-      ),
-      onVerticalDragStart: (details) {},
+    var time = Provider.of<EditTimerViewModel>(context, listen: false).time;
+
+    return TimePickerSpinner(
+      is24HourMode: true,
+      normalTextStyle: const TextStyle(fontSize: 24, color: Colors.grey),
+      highlightedTextStyle: const TextStyle(fontSize: 24, color: Colors.black),
+      spacing: 30,
+      itemHeight: 80,
+      itemWidth: MediaQuery.of(context).size.width * 0.2,
+      isShowSeconds: true,
+      time: time,
+      isForce2Digits: true,
+      isLabelShow: true,
+      onTimeChange: (time) {
+        Provider.of<EditTimerViewModel>(context, listen: false)
+            .onTimeSelect(time);
+      },
     );
   }
 }
@@ -159,7 +157,8 @@ class _TimerTitleEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var isEditMode = Provider.of<TimerViewModel>(context).isEditMode;
+    var isEditMode =
+        Provider.of<TimerViewModel>(context, listen: false).isEditMode;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -192,8 +191,11 @@ class _PageTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isEditMode =
+        Provider.of<TimerViewModel>(context, listen: false).isEditMode;
+
     return Text(
-      'Add timer',
+      isEditMode ? 'Edit timer' : 'Add timer',
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,

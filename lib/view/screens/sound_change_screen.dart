@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/model/sound/sound.dart';
-import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/sound_change_screen_view_model.dart';
 
 class SoundChangeScreen extends StatefulWidget {
@@ -16,40 +15,57 @@ class _SoundChangeScreenState extends State<SoundChangeScreen> {
   @override
   Widget build(BuildContext context) {
     var systemSoundList =
-        Provider.of<SoundChangeScreenViewModel>(context, listen: false)
-            .getSystemSounds();
+        Provider.of<SoundChangeScreenViewModel>(context).systemSoundList;
     var appSoundList =
-        Provider.of<SoundChangeScreenViewModel>(context, listen: false)
-            .getAppSounds();
+        Provider.of<SoundChangeScreenViewModel>(context).appSoundList;
 
-    return ScrollConfiguration(
-      behavior: CustomScrollBehavior(),
+    return WillPopScope(
+      onWillPop: () async {
+        Provider.of<SoundChangeScreenViewModel>(context, listen: false)
+            .stopPlayback();
+        return true;
+      },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Sound'),
-          leading: BackButton(
-            onPressed: () {
-              Provider.of<SoundChangeScreenViewModel>(context, listen: false)
-                  .stopPlayback();
-              Navigator.pop(context);
+          appBar: AppBar(
+            title: const Text('Sound'),
+            leading: BackButton(
+              onPressed: () {
+                Provider.of<SoundChangeScreenViewModel>(context, listen: false)
+                    .stopPlayback();
+                Navigator.pop(context);
+              },
+            ),
+          ),
+          body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) {
+              return [
+                SliverOverlapAbsorber(
+                    handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context),
+                    sliver: SliverList(
+                        delegate: SliverChildListDelegate(
+                      [
+                        const _CategoryName(text: 'CUSTOM'),
+                        const _CustomSound(),
+                        const _CustomDivider(),
+                        const _CategoryName(text: 'TIMER TONES'),
+                        _SoundList(soundList: appSoundList),
+                        const _CustomDivider(),
+                        const _CategoryName(text: 'SYSTEM'),
+                      ],
+                    ))),
+              ];
             },
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              const _CategoryName(text: 'CUSTOM'),
-              const _CustomSound(),
-              const _CustomDivider(),
-              const _CategoryName(text: 'TIMER TONES'),
-              _SoundList(soundList: appSoundList),
-              const _CustomDivider(),
-              const _CategoryName(text: 'SYSTEM'),
-              _SoundList(soundList: systemSoundList),
-            ],
-          ),
-        ),
-      ),
+            body: Container(
+              height: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).viewPadding.top,
+              child: Column(
+                children: [
+                  Expanded(child: _SoundList(soundList: systemSoundList)),
+                ],
+              ),
+            ),
+          )),
     );
   }
 }
@@ -68,7 +84,6 @@ class _SoundList extends StatelessWidget {
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(soundList[index].title),

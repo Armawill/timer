@@ -2,18 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timer/view-model/overlay_view_model.dart';
 
-class OverlayWidget extends StatefulWidget {
+class OverlayWidget extends StatelessWidget {
   const OverlayWidget({super.key});
-
-  @override
-  State<OverlayWidget> createState() => _OverlayWidgetState();
-}
-
-class _OverlayWidgetState extends State<OverlayWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +104,7 @@ class _TimerInfoState extends State<_TimerInfo> {
 
   @override
   void dispose() {
-    Provider.of<OverlayViewModel>(context, listen: false).dispose();
+    // Provider.of<OverlayViewModel>(context, listen: false).dispose();
     super.dispose();
   }
 

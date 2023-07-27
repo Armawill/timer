@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 
 import 'package:timer/services/background_service.dart';
 import 'package:timer/services/local_storage_service.dart';
+import 'package:timer/services/notification_service.dart';
 import 'package:timer/services/overlay_service.dart';
+import 'package:timer/utils/app_page_route_builder.dart';
 import 'package:timer/utils/app_theme.dart';
 import 'package:timer/utils/custom_scroll_behavior.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
@@ -21,15 +23,10 @@ final service = FlutterBackgroundService();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageService.initialize();
-  // await NotificationService.initialize();
+  await NotificationService.initialize();
   await OverlayService.initialize();
-
   runApp(const MyApp());
 }
-
-// getOverlayPermission() async {
-//   await OverlayService.initialize();
-// }
 
 // overlay entry point
 @pragma("vm:entry-point")
@@ -70,10 +67,12 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.getThemeData(),
         onGenerateRoute: (settings) {
           if (settings.name == SettingsScreen.routeName) {
-            return AppTheme.buildRoute(const SettingsScreen(), settings);
+            return AppPageRouteBuilder.buildRoute(
+                const SettingsScreen(), settings);
           }
           if (settings.name == SoundChangeScreen.routeName) {
-            return AppTheme.buildRoute(const SoundChangeScreen(), settings);
+            return AppPageRouteBuilder.buildRoute(
+                const SoundChangeScreen(), settings);
           }
         },
       ),

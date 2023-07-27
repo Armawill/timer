@@ -17,6 +17,8 @@ class SoundChangeScreenViewModel extends ChangeNotifier {
   final AudioPlayer audioPlayer = AudioPlayer();
 
   final List<Sound> _soundList = [];
+  final List<Sound> _systemSoundList = [];
+  final List<Sound> _appSoundList = [];
 
   String _customSound = '';
 
@@ -29,6 +31,8 @@ class SoundChangeScreenViewModel extends ChangeNotifier {
   String get customSound => _customSound;
 
   List<Sound> get soundList => _soundList;
+  List<Sound> get systemSoundList => _systemSoundList;
+  List<Sound> get appSoundList => _appSoundList;
 
   bool get isCustomSound => _isCustomSound;
 
@@ -62,6 +66,18 @@ class SoundChangeScreenViewModel extends ChangeNotifier {
               id: element.id, title: element.title, uri: element.uri));
         }
       }
+
+      for (var sound in _soundList) {
+        if (sound.isFromUri) {
+          systemSoundList.add(sound);
+        }
+      }
+
+      for (var sound in _soundList) {
+        if (sound.isFromAsset) {
+          appSoundList.add(sound);
+        }
+      }
     }
 
     _selectedSound = await LocalStorageService.loadSoundSettings();
@@ -76,28 +92,30 @@ class SoundChangeScreenViewModel extends ChangeNotifier {
       LocalStorageService.saveSound(_selectedSound);
     }
 
+    await Future.delayed(const Duration(milliseconds: 300));
+
     notifyListeners();
   }
 
-  List<Sound> getSystemSounds() {
-    List<Sound> systemSoundList = [];
-    for (var sound in _soundList) {
-      if (sound.isFromUri) {
-        systemSoundList.add(sound);
-      }
-    }
-    return systemSoundList;
-  }
+  // List<Sound> getSystemSounds() {
+  //   List<Sound> systemSoundList = [];
+  //   for (var sound in _soundList) {
+  //     if (sound.isFromUri) {
+  //       systemSoundList.add(sound);
+  //     }
+  //   }
+  //   return systemSoundList;
+  // }
 
-  List<Sound> getAppSounds() {
-    List<Sound> appSoundList = [];
-    for (var sound in _soundList) {
-      if (sound.isFromAsset) {
-        appSoundList.add(sound);
-      }
-    }
-    return appSoundList;
-  }
+  // List<Sound> getAppSounds() {
+  //   List<Sound> appSoundList = [];
+  //   for (var sound in _soundList) {
+  //     if (sound.isFromAsset) {
+  //       appSoundList.add(sound);
+  //     }
+  //   }
+  //   return appSoundList;
+  // }
 
   void setCustomSound() async {
     var prefs = await SharedPreferences.getInstance();

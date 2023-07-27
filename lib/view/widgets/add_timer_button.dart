@@ -6,30 +6,8 @@ import 'package:timer/view/widgets/custom_modal_bottom_sheet.dart';
 import 'package:timer/view-model/edit_timer_view_model.dart';
 import 'package:timer/view-model/timer_view_model.dart';
 
-class AddTimerButton extends StatefulWidget {
+class AddTimerButton extends StatelessWidget {
   const AddTimerButton({super.key});
-
-  @override
-  State<AddTimerButton> createState() => _AddTimerButtonState();
-}
-
-class _AddTimerButtonState extends State<AddTimerButton>
-    with TickerProviderStateMixin {
-  // late AnimationController controller;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   controller = BottomSheet.createAnimationController(this);
-  //   controller.duration = const Duration(seconds: 1);
-  //   controller.reverseDuration = const Duration(seconds: 1);
-  // }
-
-  // @override
-  // void dispose() {
-  //   controller.dispose();
-  //   super.dispose();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +16,11 @@ class _AddTimerButtonState extends State<AddTimerButton>
       width: 100,
       child: ElevatedButton(
         onPressed: () {
+          var currentTime =
+              Provider.of<TimerViewModel>(context, listen: false).time;
+          Provider.of<EditTimerViewModel>(context, listen: false)
+              .setTime(currentTime);
+
           showModalBottomSheet(
             context: context,
             enableDrag: true,
@@ -61,9 +44,6 @@ class _AddTimerButtonState extends State<AddTimerButton>
               },
             ),
           );
-          // .whenComplete(() {
-          //   controller = BottomSheet.createAnimationController(this);
-          // });
         },
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),

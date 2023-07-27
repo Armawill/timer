@@ -15,6 +15,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    var selectedSound =
+        Provider.of<SoundChangeScreenViewModel>(context).selectedSound;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -23,24 +25,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: ListView(
         children: [
-          ListTile(
-            title: const Text('Timer'),
-            onTap: () {},
-          ),
+          // ListTile(
+          //   title: const Text('Timer'),
+          //   onTap: () {},
+          // ),
           ListTile(
             title: const Text('Sound'),
+            subtitle: Text(
+              selectedSound.title,
+              style: const TextStyle(color: Colors.red),
+            ),
             trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () async {
-              await Provider.of<SoundChangeScreenViewModel>(context,
-                      listen: false)
-                  .getSounds();
+            onTap: () {
               Navigator.of(context).pushNamed(SoundChangeScreen.routeName);
             },
           ),
-          ListTile(
-            title: const Text('Date & Time'),
-            onTap: () {},
-          ),
+          // ListTile(
+          //   title: const Text('Date & Time'),
+          //   onTap: () {},
+          // ),
         ],
       ),
     );

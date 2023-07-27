@@ -142,12 +142,12 @@ class NotificationService {
           ?.requestPermission();
     }
 
-    tzl.initializeTimeZones();
-    var locationName = await FlutterNativeTimezone.getLocalTimezone();
-    if (locationName == 'Europe/Kiev') {
-      locationName = 'Europe/Zaporozhye';
-    }
-    tz.setLocalLocation(tz.getLocation(locationName));
+    // tzl.initializeTimeZones();
+    // var locationName = await FlutterNativeTimezone.getLocalTimezone();
+    // if (locationName == 'Europe/Kiev') {
+    //   locationName = 'Europe/Zaporozhye';
+    // }
+    // tz.setLocalLocation(tz.getLocation(locationName));
 
     var androidInitialize = AndroidInitializationSettings('mipmap/app_icon');
     var initializationSettings =

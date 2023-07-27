@@ -60,28 +60,12 @@ class _DeleteButton extends StatefulWidget {
   State<_DeleteButton> createState() => _DeleteButtonState();
 }
 
-class _DeleteButtonState extends State<_DeleteButton>
-    with TickerProviderStateMixin {
-  // late AnimationController controller;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   controller = BottomSheet.createAnimationController(this);
-  //   controller.duration = const Duration(seconds: 1);
-  //   controller.reverseDuration = const Duration(seconds: 1);
-  // }
-
-  // @override
-  // void dispose() {
-  //   controller.dispose();
-  //   super.dispose();
-  // }
-
+class _DeleteButtonState extends State<_DeleteButton> {
   @override
   Widget build(BuildContext context) {
     var isAnyTimerChecked =
         Provider.of<TimerViewModel>(context).isAnyTimerChecked;
+
     return Container(
       alignment: Alignment.bottomCenter,
       padding: const EdgeInsets.only(bottom: 10),
@@ -96,7 +80,6 @@ class _DeleteButtonState extends State<_DeleteButton>
                 context: context,
                 isDismissible: false,
                 enableDrag: false,
-                // transitionAnimationController: controller,
                 shape: const RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(15))),
@@ -299,10 +282,11 @@ class _Page extends StatelessWidget {
   final int count;
   final List<Timer> items;
   final bool isLastPage;
-  const _Page(
-      {required this.count,
-      required this.items,
-      required this.isLastPage});
+  const _Page({
+    required this.count,
+    required this.items,
+    required this.isLastPage,
+  });
 
   @override
   Widget build(BuildContext context) {
